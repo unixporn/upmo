@@ -44,7 +44,7 @@ TAGSTRING = ["[question]", "[discussion]", "[oc]", "[material]", "[meta]"]
 # Tags to look for
 OSSTRING = ["[arch]", "[archlinux]", "[arch linux]", "[ubuntu]", "[debian]", "[crunchbang]", "[#!]", "[fedora]", "[mint]", "[linux mint]", "[linuxmint]", "[eos]", "[elementary]", "[elementaryos]", "[elementary os]", "[manjaro]", "[gentoo]", "[opensuse]", "[slackware]", "[crux]", "[funtoo]", "[exherbo]", "[lmde]", "[lubuntu]", "[bodhi]", "[centos]", "[nixos]", "[korora]", "[parabola]", "[chakra]", "[lfs]", "[xubuntu]", "[kubuntu]", "[linux]", "[gnu/linux]", "[android]", "[bsd]", "[aix]", "[plan9]", "[freebsd]", "[openbsd]", "[dragonflybsd]", "[netbsd]"] 
 # Whitelisted websites
-WHITELIST = ["self."+SUBREDDIT, "imgur.com", "minus.com", "gfycat.com", "pub.iotek.org", "u.teknik.io", "mediacru.sh"]
+WHITELIST = ["reddit.com/r/"+SUBREDDIT, "imgur.com", "minus.com", "gfycat.com", "pub.iotek.org", "u.teknik.io", "mediacru.sh"]
 
 # Message about reporting errors
 CONTACT = "\n\n*^[Contact](http://www.reddit.com/message/compose?to=%2Fr%2F{0}) ^[us](http://www.reddit.com/message/compose?to=%2Fr%2F{0}) ^(if our bot has messed up)*".format(SUBREDDIT)
@@ -269,7 +269,7 @@ def flair_assign():
 			if flair == "":
 				print(pid + ": No Flair")
 
-				if "self."+SUBREDDIT in purl:
+				if "reddit.com/r/"+SUBREDDIT in purl:
 					print("\tAssigning 'Discussion' flair")
 					post.set_flair(flair_text="Discussion",flair_css_class="discussion")
 					flair = "Discussion"
