@@ -267,22 +267,22 @@ def flair_assign():
 
 				if "self."+SUBREDDIT in purl:
 					print("\tAssigning 'Discussion' flair")
-					post.set_flair(flair_text=Discussion,flair_css_class=discussion)
+					post.set_flair(flair_text="Discussion",flair_css_class="discussion")
 					flair = "Discussion"
 				
 				elif any(word in ptitle for word in HWSTRING):
 					print("\tAssigning 'Hardware' flair")
-					post.set_flair(flair_text=Hardware,flair_css_class=hardware)
+					post.set_flair(flair_text="Hardware",flair_css_class="hardware")
 					flair = "Hardware"
 				
 				elif any(word in purl for word in [".webm", ".gif", "gfycat"]):
 					print("\tAssigning 'Workflow' flair")
-					post.set_flair(flair_text=Workflow,flair_css_class=workflow)
+					post.set_flair(flair_text="Workflow",flair_css_class="workflow")
 					flair = "Workflow"
 				
 				else:
 					print("\tAssigning 'Screenshot' flair")
-					post.set_flair(flair_text=Screenshot,flair_css_class=screenshot)
+					post.set_flair(flair_text="Screenshot",flair_css_class="screenshot")
 					flair = "Screenshot"
 				
 				print(pid + ", " + pauthor + ": Flair Assigned")
