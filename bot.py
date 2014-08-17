@@ -174,8 +174,12 @@ def tag_check():
 				post.remove(spam=False)
 				print("\tPost removed")
 				time.sleep(5)
+			else:
+				pass
 
 			if any(tag in pbody for tag in ["[", "]"]):
+				pass
+			else:
 				print("Replying to " + pid + " by " + pauthor)
 				response = post.add_comment(NOTAGREPLYSTRING)
 				response.distinguish()
