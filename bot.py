@@ -192,7 +192,7 @@ def flair_assign(post):
 			print("\tAssigning 'Hardware' flair")
 			post.set_flair(flair_text="Hardware",flair_css_class="hardware")
 			
-		elif any(word in purl for word in [".webm", ".gif", "gfycat"]):
+		elif any(word in purl for word in [".webm", ".gif", "gfycat", ".mp4"]):
 			print("\tAssigning 'Workflow' flair")
 			post.set_flair(flair_text="Workflow",flair_css_class="workflow")
 			
