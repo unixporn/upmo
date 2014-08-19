@@ -258,16 +258,16 @@ def details_scan():
 					
 			if found == True and short == False:
 				print("\tComment is okay. Passing")
-		else:
-			differences = str("%.0f" % (DELAY - difference))
-			print("\tStill has " + differences + "s.")
-			return False
-
-		if difference > ( DELAY * 0.5 ):
+		elif difference > ( DELAY * 0.5 ):
+			print("Warning OP")
 			commenters = [coment.author.name for comment in comments]
 			if "upmo" not in commenters:
 				response = post.add_comment(DETAILSSTRING)
 				response.distinguish()
+		else:
+			differences = str("%.0f" % (DELAY - difference))
+			print("\tStill has " + differences + "s.")
+			return False
 
 	if post.is_self == True:
 		print(pid + ", " + pauthor + ": Ignoring Selfpost")
