@@ -32,7 +32,7 @@ WAIT = 60
 # Mods aren"t excemptoldposts
 IGNOREMODS = False
 # Time before post is removed
-DELAY = 600
+DELAY = 1200
 # Minimum comment lentgh
 MINLENGTH = 10
 # WGW start
@@ -263,7 +263,7 @@ def details_scan():
 			print("\tStill has " + differences + "s.")
 			return False
 
-		if difference < ( DELAY * 0.5 ):
+		if difference > ( DELAY * 0.5 ):
 			commenters = [coment.author.name for comment in comments]
 			if "upmo" not in commenters:
 				response = post.add_comment(DETAILSSTRING)
