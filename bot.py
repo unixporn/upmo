@@ -261,7 +261,7 @@ def details_scan():
 		
 		elif difference > ( DELAY * 0.5 ):
 			commenters = [comment.author.name for comment in comments]
-			if "upmo" not in commenters:
+			if (found == False) and ("upmo" not in commenters):
 				print("Warning OP")
 				response = post.add_comment(DETAILSSTRING)
 				response.distinguish()
