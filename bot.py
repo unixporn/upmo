@@ -31,6 +31,8 @@ WAIT = 60
 DELAY = 1200
 # WGW start
 WGWNUMBER = 8
+# Toggles whether bot reports before removal
+TRUSTME = True
 
 # Direct link to send mod mail
 MODMSG = "http://www.reddit.com/message/compose?to=%2Fr%2F" + SUBREDDIT
@@ -151,6 +153,15 @@ while Trying:
 
 """DEFINING FUNCTIONS"""
 
+def slay(post, response):
+	print("Replying to " + post.id)
+	res = post.add_comment(response)
+	res.distinguish()
+	if TRUSTME == False: post.report()
+	post.remove(spam=False)
+	print("\tPost removed")
+	sleep(5)
+
 
 def weekly_post():
 	now = datetime.now()
@@ -163,70 +174,40 @@ def weekly_post():
 
 def tag_check(post, pid, pauthor, ptitle):
 	print("Checking tags...")
-
 	if any(key.lower() in ptitle for key in TAGSTRING):
-		print("Replying to " + pid + " by " + pauthor)
-		response = post.add_comment(DEPTAGREPLY)
-		response.distinguish()
-		post.remove(spam=False)
-		print("\tPost removed")
-		sleep(5)
-
+		slay(post, DEPTAGREPLY)
 	elif any(key.lower() in ptitle for key in OSSTRING):
-		print("Replying to " + pid + " by " + pauthor)
-		response = post.add_comment(OSREPLY)
-		response.distinguish()
-		post.remove(spam=False)
-		print("\tPost removed")
-		sleep(5)
-
+		slay(post, OSREPLY)
 	elif any(tag in ptitle for tag in ["[", "]"]) or post.is_self == True:
 		pass
 	else:
-		print("Replying to " + pid + " by " + pauthor)
-		response = post.add_comment(NOTAGREPLY)
-		response.distinguish()
-		post.remove(spam=False)
-		print("\tPost removed")
-		sleep(5)
+		slay(post, NOTAGREPLY)
 
 
 def approve_host(post, pid, pauthor, purl):
 	print("Verifying hosts...")
-
 	if any(domain in purl for domain in WHITELIST) or post.is_self == True:
 		pass
 	else:
-		print("Replying to " + pid + " by " + pauthor)
-		response = post.add_comment(HOSTRESPONSE)
-		response.distinguish()
-		post.remove(spam=False)
-		print("\tPost removed")
-		sleep(5)
+		slay(post, HOSTRESPONSE)
 
 
 def flair_assign(post, pid, pauthor, purl, ptitle, flair):
 	print("Scanning for flairs...")
-
 	if flair == "":
 		print(pid + ": No Flair")
-
 		if post.is_self == True:
 			print("\tAssigning 'Discussion' flair")
 			post.set_flair(flair_text="Discussion",flair_css_class="discussion")
-			
 		elif any(word in ptitle for word in HWSTRING):
 			print("\tAssigning 'Hardware' flair")
 			post.set_flair(flair_text="Hardware",flair_css_class="hardware")
-			
 		elif any(word in purl for word in [".webm", ".gif", "gfycat", ".mp4"]):
 			print("\tAssigning 'Workflow' flair")
 			post.set_flair(flair_text="Workflow",flair_css_class="workflow")
-			
 		else:
 			print("\tAssigning 'Screenshot' flair")
 			post.set_flair(flair_text="Screenshot",flair_css_class="screenshot")
-				
 		print(pid + ", " + pauthor + ": Flair Assigned")
 	else:
 		print(pid + ", " + pauthor + ": Already Flaired")
@@ -236,10 +217,8 @@ def details_scan(post, pid, pauthor, ptime):
 	print("Checking details comments...")
 	found = False
 	curtime = datetime.now(timezone.utc).timestamp()
-
 	if post.is_self == False:
 		difference = curtime - ptime
-				
 		print(pid + ", " + pauthor + ": Finding comments")
 		comments = helpers.flatten_tree(post.comments)
 		for comment in comments:
@@ -251,19 +230,11 @@ def details_scan(post, pid, pauthor, ptime):
 			if cauthor == pauthor and found == False:
 				print("\tFound comment by OP")
 				found = True
-		
 		if found == True:
 			print("\tComment is okay. Passing")
-
 		else:
 			if difference > DELAY:
-				print("\tComments were empty, or OP was not found. Post will be removed.")
-				response = post.add_comment(NODETAILS)
-				response.distinguish()
-				post.remove(spam=False)
-				print("\tPost removed")
-				sleep(5)
-		
+				slay(post, NODETAILS)
 			elif difference > ( DELAY * 0.5 ):
 				commenters = [comment.author.name for comment in comments]
 				if (found == False) and ("upmo" not in commenters):
@@ -271,12 +242,10 @@ def details_scan(post, pid, pauthor, ptime):
 					response = post.add_comment(DETAILSWARN)
 					response.distinguish()
 				return False
-		
 			else:
 				differences = str("%.0f" % (DELAY - difference))
 				print("\tStill has " + differences + "s.")
 				return False
-
 	else:
 		print(pid + ", " + pauthor + ": Ignoring Selfpost")
 
@@ -295,7 +264,6 @@ def actions(post):
 		flair = post.link_flair_text.lower()
 	except AttributeError:
 			flair = ""
-
 	# Post actions
 	print("\nScanning", pid)
 	tag_check(post, pid, pauthor, ptitle)
@@ -327,7 +295,6 @@ while True:
 				actions(post)
 	except Exception as e:
 		print("An error has occured\n", e)
-
 	for var in range(WAIT, 0, -1):
 		stdout.write("\rRunning again in " + str(var) + "s. ")
 		stdout.flush()
