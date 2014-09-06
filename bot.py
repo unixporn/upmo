@@ -7,12 +7,10 @@
 # is licensed under the MIT License, without any warranty
 
 # Required modules
-import datetime
-import praw
 from sys import stdout
 from time import sleep
-
-
+from datetime import datetime, timezone
+from praw import errors, helpers, Reddit
 
 """CONFIGURATION"""
 
@@ -23,52 +21,111 @@ PASSWORD  = "PASSWORD"
 # Sub to scan for new posts
 SUBREDDIT = "SUBREDDIT"
 # Short description of what the bot does
-USERAGENT = "Automated moderator for /r/{0} (currently in testing)".format(SUBREDDIT)
+USERAGENT = "Automated moderator for /r/" + SUBREDDIT
 
 # How many posts to retrieve at once (max 100)
 MAXPOSTS = 10
 # How many seconds to wait inbetween cycles. Bot is inactive during this time.
 WAIT = 60
-# Mods aren"t excemptoldposts
-IGNOREMODS = False
 # Time before post is removed
 DELAY = 1200
-# Minimum comment lentgh
-MINLENGTH = 10
 # WGW start
 WGWNUMBER = 8
 
-# Hardware tags
-HWSTRING = ["[desktop]", "[laptop]", "[server]", "[phone]", "[tablet]", "[multi]"]
-# Deprecated tags
-TAGSTRING = ["[question]", "[discussion]", "[oc]", "[material]", "[meta]"]
-# OS tags
-OSSTRING = ["[arch]", "[archlinux]", "[arch linux]", "[ubuntu]", "[debian]", "[crunchbang]", "[#!]", "[fedora]", "[mint]", "[linux mint]", "[linuxmint]", "[eos]", "[elementary]", "[elementaryos]", "[elementary os]", "[manjaro]", "[gentoo]", "[opensuse]", "[slackware]", "[crux]", "[funtoo]", "[exherbo]", "[lmde]", "[lubuntu]", "[bodhi]", "[centos]", "[nixos]", "[korora]", "[parabola]", "[chakra]", "[lfs]", "[xubuntu]", "[kubuntu]", "[linux]", "[gnu/linux]", "[android]", "[bsd]", "[aix]", "[plan9]", "[freebsd]", "[openbsd]", "[dragonflybsd]", "[netbsd]"] 
-# Whitelisted websites
+# Direct link to send mod mail
+MODMSG = "http://www.reddit.com/message/compose?to=%2Fr%2F" + SUBREDDIT
+# Direct link for information about hosting
+HOSTLINK = "http://www.reddit.com/r/" + SUBREDDIT + "/wiki/info/rules#wiki_2.0_-_hosting"
+# Direct link for information about post catagories
+CATLINK = "http://www.reddit.com/r/" + SUBREDDIT + "/wiki/info/rules#wiki_3.0_-_categorisation"
+# Markdown formatted link for details comment template
+TEMPLATE = "[details comment](http://www.reddit.com/r/" + SUBREDDIT + "/wiki/info/template)"
+
+# Website Whitelist
 WHITELIST = ["imgur.com", "minus.com", "gfycat.com", "pub.iotek.org", "u.teknik.io", "mediacru.sh"]
+# Strings for the "Hardware" flair
+HWSTRING = ["[desktop]", "[laptop]", "[server]", "[phone]", "[tablet]", "[multi]"]
+# Title tags which shouldn't be used
+TAGSTRING = ["[discussion]", "[help]", "[material]", "[meta]", "[oc]"]
+# Banned OS title tags
+OSSTRING = ["aix",
+			"android",
+			"arch", "archlinux", "arch linux",
+			"bodhi",
+			"bsd",
+			"centos",
+			"chakra",
+			"crunchbang", "#!",
+			"crux",
+			"debian",
+			"dragonflybsd",
+			"eos", "elementary", "elementaryos", "elementary os",
+			"exherbo",
+			"fedora",
+			"freebsd",
+			"funtoo",
+			"gentoo",
+			"hurd", "gnu/hurd",
+			"korora",
+			"kubuntu",
+			"lfs", "linux", "gnu/linux",
+			"linux mint", "linuxmint", "mint", "lmde",
+			"lubuntu",
+			"manjaro",
+			"netbsd",
+			"nixos",
+			"openbsd",
+			"opensuse",
+			"parabola",
+			"plan9",
+			"slackware",
+			"ubuntu",
+			"xubuntu"]
+OSSTRING = ["[" + OS + "]" for OS in OSSTRING]
 
-# Message about reporting errors
-CONTACT = "\n\n*^[Contact](http://www.reddit.com/message/compose?to=%2Fr%2F{0}) ^[us](http://www.reddit.com/message/compose?to=%2Fr%2F{0}) ^(if our bot has messed up)*".format(SUBREDDIT)
-# Link to details template
-TEMPLATE = "[details comment](http://www.reddit.com/r/{0}/wiki/info/template)".format(SUBREDDIT)
+# Message about reporting bot errors
+CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed ^up)*".format(MODMSG)
 
-# Lack of details
-MESSAGE = "You have not provided a {0} so the post has been removed. Please add one and message the mod team so we can approve your post.{1}".format(TEMPLATE, CONTACT)
-# Short details
-TOOSHORT = "You have added a {0}, but it looks quite short. Try to add some more info.{1}".format(TEMPLATE, CONTACT)
-# Missing tags
-NOTAGREPLYSTRING = "Your post title appears to be missing a [tag]. See [section 3](http://www.reddit.com/r/unixporn/wiki/info/rules#wiki_3.0_-_categorisation) for more details but briefly:\n\n* Screenshots requires [WM/DE]\n\n* Workflow requires [WM/DE]\n\n* Hardware requires [DEVICE]{0}".format(CONTACT)
-# Deprecated tags
-TAGREPLYSTRING = "Your post appeats to be using one of the deprecated [tags]. Please use a link flair instead.{0}".format(CONTACT)
-# OS Tag
-OSREPLYSTRING = "Your post appeats to be using the OS [tag]. This is now deprecated in favour of userflair.{0}".format(CONTACT)
-# Approved host
-HOSTRESPONSE = "You don't appear to be using an [approved host](http://www.reddit.com/r/unixporn/wiki/info/rules#wiki_2.0_-_hosting). Please resubmit using one of them, but feel free to leave mirrors to host in your details comment.{0}".format(CONTACT)
-# Details warning
-DETAILSSTRING = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
-# WGW body
-WGWBODY = "In this thread users can post any screenshot, no matter how close to default it may be, and any question, no mater how stupid they think it may be. For this discussion rules 2.1-5, 2.7-9 and 3.1-2 are all laxed. This basically means you can post anything on topic, in any format you like, and using any host. We hope this gives new users a chance to get some help with any problems they're having and older users a chance to show of their knowledge by helping those in need.\n\nPlease respect that the lax rules for WGW apply only within this thread and normal submission rules still apply for the main sub."
+# Message when haven't added a details comment
+NODETAILS = "You have not provided a {0} so the post has been removed." \
+			"Please add one and message the mod team so we can approve " \
+			"your post.{1}".format(TEMPLATE, CONTACT)
 
+# Message when not using a tag
+NOTAGREPLY = "Your post title appears to be missing a [tag]. " \
+			 "See [section 3]({0}) for more details but briefly:" \
+			 "\n\n* Screenshots requires [WM/DE]\n\n* Workflow " \
+			 "requires [WM/DE]\n\n* Hardware requires [DEVICE]" \
+			 "\n\n* Material requires [TYPE]{1}".format(CATLINK, CONTACT)
+
+# Message when using a deprecated tag
+DEPTAGREPLY = "Your post appeats to be using one of the deprecated " \
+			  "[tags]. Please use a link flair instead." + CONTACT
+
+# Message when stating OS in a title tag
+OSREPLY = "Your post appeats to be using the OS [tag]. This is " \
+		  "now deprecated in favour of userflair." + CONTACT
+
+# Message when not using an approved host
+HOSTRESPONSE = "You don't appear to be using an [approved host](). " \
+			   "Please resubmit using one of them, but feel free to " \
+			   "leave mirrors to host in your details comment." + CONTACT
+
+# Warning when haven't added a details comment
+DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
+
+# Post body for weekly thread
+WGWBODY = "In this thread users can post any screenshot, no matter " \
+		  "how close to default it may be, and any question, no mater " \
+		  "how stupid they think it may be. For this discussion rules " \
+		  "2.1-5, 2.7-9 and 3.1-2 are all laxed. This basically means " \
+		  "you can post anything on topic, in any format you like, and " \
+		  "using any host. We hope this gives new users a chance to get " \
+		  "some help with any problems they're having and older users a " \
+		  "chance to show of their knowledge by helping those in need." \
+		  "\n\nPlease respect that the lax rules for WGW apply only " \
+		  "within this thread and normal submission rules still apply " \
+		  "for the main sub." + CONTACT
 
 print(SUBREDDIT, "bot\n")
 
@@ -76,14 +133,14 @@ print(SUBREDDIT, "bot\n")
 
 """BOT LOGIN"""
 
-r = praw.Reddit(USERAGENT)
+r = Reddit(USERAGENT)
 Trying = True
 while Trying:
 	try:
 		r.login(USERNAME, PASSWORD)
 		print("Successfully logged in\n")
 		Trying = False
-	except praw.errors.InvalidUserPass:
+	except errors.InvalidUserPass:
 		print("Wrong Username or Password\n")
 		quit()
 	except Exception as e:
@@ -94,17 +151,9 @@ while Trying:
 
 """DEFINING FUNCTIONS"""
 
-def getTime(bool):
-	timeNow = datetime.datetime.now(datetime.timezone.utc)
-	timeUnix = timeNow.timestamp()
-	if bool == False:
-		return timeNow
-	else:
-		return timeUnix
-
 
 def weekly_post():
-	now = datetime.datetime.now()
+	now = datetime.now()
 	if now.weekday() == 5 and now.hour == 0 and now.minute == 0:
 		print("Creating weekend post...")
 		newpost = r.submit(SUBREDDIT, "\"Whatever Goes\" weekend #{0}".format(WGWNUMBER), text=WGWBODY)
@@ -112,51 +161,40 @@ def weekly_post():
 		WGWNUMBER += 1
 
 
-def tag_check(post):
+def tag_check(post, pid, pauthor, ptitle):
 	print("Checking tags...")
-	pid = post.id
-	try:
-		pauthor = post.author.name
-	except AttributeError:
-		pauthor = "[DELETED]"
-	ptitle = post.title.lower()
 
 	if any(key.lower() in ptitle for key in TAGSTRING):
 		print("Replying to " + pid + " by " + pauthor)
-		response = post.add_comment(TAGREPLYSTRING)
+		response = post.add_comment(DEPTAGREPLY)
 		response.distinguish()
 		post.remove(spam=False)
 		print("\tPost removed")
 		sleep(5)
 
-	if any(key.lower() in ptitle for key in OSSTRING):
+	elif any(key.lower() in ptitle for key in OSSTRING):
 		print("Replying to " + pid + " by " + pauthor)
-		response = post.add_comment(OSREPLYSTRING)
+		response = post.add_comment(OSREPLY)
 		response.distinguish()
 		post.remove(spam=False)
 		print("\tPost removed")
 		sleep(5)
 
-	if any(tag in ptitle for tag in ["[", "]"]) or post.is_self == True:
+	elif any(tag in ptitle for tag in ["[", "]"]) or post.is_self == True:
 		pass
 	else:
 		print("Replying to " + pid + " by " + pauthor)
-		response = post.add_comment(NOTAGREPLYSTRING)
+		response = post.add_comment(NOTAGREPLY)
 		response.distinguish()
 		post.remove(spam=False)
 		print("\tPost removed")
 		sleep(5)
 
 
-def approve_host(post):
+def approve_host(post, pid, pauthor, purl):
 	print("Verifying hosts...")
-	pid = post.id
-	try:
-		pauthor = post.author.name
-	except AttributeError:
-		pauthor = "[DELETED]"
-	pbody = post.url
-	if any(domain in pbody for domain in WHITELIST) or post.is_self == True:
+
+	if any(domain in purl for domain in WHITELIST) or post.is_self == True:
 		pass
 	else:
 		print("Replying to " + pid + " by " + pauthor)
@@ -167,19 +205,8 @@ def approve_host(post):
 		sleep(5)
 
 
-def flair_assign(post):
+def flair_assign(post, pid, pauthor, purl, ptitle, flair):
 	print("Scanning for flairs...")
-	pid = post.id
-	ptitle = post.title.lower()
-	purl = post.url
-	try:
-		pauthor = post.author.name
-	except AttributeError:
-		pauthor = "[deleted]"
-	try:
-		flair = post.link_flair_text.lower()
-	except AttributeError:
-			flair = ""
 
 	if flair == "":
 		print(pid + ": No Flair")
@@ -205,24 +232,16 @@ def flair_assign(post):
 		print(pid + ", " + pauthor + ": Already Flaired")
 
 
-def details_scan():
+def details_scan(post, pid, pauthor, ptime):
 	print("Checking details comments...")
 	found = False
-	short = False
-	opc = []
-	pid = post.id
-	try:
-		pauthor = post.author.name
-	except AttributeError:
-		pauthor = "[deleted]"
-	ptime = post.created_utc
-	curtime = getTime(True)		
+	curtime = datetime.now(timezone.utc).timestamp()
 
 	if post.is_self == False:
 		difference = curtime - ptime
 				
 		print(pid + ", " + pauthor + ": Finding comments")
-		comments = praw.helpers.flatten_tree(post.comments)
+		comments = helpers.flatten_tree(post.comments)
 		for comment in comments:
 			cid = "t3_" + comment.id
 			try:
@@ -232,48 +251,61 @@ def details_scan():
 			if cauthor == pauthor and found == False:
 				print("\tFound comment by OP")
 				found = True
-				cbody = comment.body
-				clength = len(cbody)
-				opc.append(clength)
-
+		
 		if found == True:
-			if all(num < MINLENGTH for num in opc):
-				print("\tAll OP comments too short")
-				short = True
-				
-		if difference > DELAY:		 
-			if found == False:
+			print("\tComment is okay. Passing")
+
+		else:
+			if difference > DELAY:
 				print("\tComments were empty, or OP was not found. Post will be removed.")
-				response = post.add_comment(MESSAGE)
+				response = post.add_comment(NODETAILS)
 				response.distinguish()
 				post.remove(spam=False)
 				print("\tPost removed")
 				sleep(5)
-							
-			if found == True and short == True:
-				print("\tFound comment, but reporting for length")
-				post.report()
-				response = post.add_comment(TOOSHORT)
-				response.distinguish()
-					
-			if found == True and short == False:
-				print("\tComment is okay. Passing")
 		
-		elif difference > ( DELAY * 0.5 ):
-			commenters = [comment.author.name for comment in comments]
-			if (found == False) and ("upmo" not in commenters):
-				print("Warning OP")
-				response = post.add_comment(DETAILSSTRING)
-				response.distinguish()
-			return False
+			elif difference > ( DELAY * 0.5 ):
+				commenters = [comment.author.name for comment in comments]
+				if (found == False) and ("upmo" not in commenters):
+					print("Warning OP")
+					response = post.add_comment(DETAILSWARN)
+					response.distinguish()
+				return False
 		
-		else:
-			differences = str("%.0f" % (DELAY - difference))
-			print("\tStill has " + differences + "s.")
-			return False
+			else:
+				differences = str("%.0f" % (DELAY - difference))
+				print("\tStill has " + differences + "s.")
+				return False
 
-	if post.is_self == True:
+	else:
 		print(pid + ", " + pauthor + ": Ignoring Selfpost")
+
+
+def actions(post):
+	# Post variables
+	pid = post.id
+	ptitle = post.title.lower()
+	purl = post.url
+	ptime = post.created_utc
+	try:
+		pauthor = post.author.name
+	except AttributeError:
+		pauthor = "[DELETED]"
+	try:
+		flair = post.link_flair_text.lower()
+	except AttributeError:
+			flair = ""
+
+	# Post actions
+	print("\nScanning", pid)
+	tag_check(post, pid, pauthor, ptitle)
+	approve_host(post, pid, pauthor, purl)
+	flair_assign(post, pid, pauthor, purl, ptitle, flair)
+	if details_scan(post, pid, pauthor, ptime) == False:
+		pass
+	else:
+		with open("oldposts","a+") as file:
+			file.write(pid + "\n")
 
 
 
@@ -281,7 +313,7 @@ def details_scan():
 
 print("Running on /r/{0}".format(SUBREDDIT))
 while True:
-	print("\nRunning at " + str(getTime(0)))
+	print("\nRunning at " + str(datetime.now(timezone.utc)))
 	subreddit = r.get_subreddit(SUBREDDIT)
 	posts = subreddit.get_new(limit=MAXPOSTS)
 	with open("oldposts", "r") as file:
@@ -292,17 +324,10 @@ while True:
 			if post.id in oldposts:
 				pass
 			else:
-				print("\nScanning", post.id)
-				tag_check(post)
-				approve_host(post)
-				flair_assign(post)
-				if details_scan() == False:
-					pass
-				else:
-					with open("oldposts","a+") as file:
-						file.write(post.id + "\n")
+				actions(post)
 	except Exception as e:
 		print("An error has occured\n", e)
+
 	for var in range(WAIT, 0, -1):
 		stdout.write("\rRunning again in " + str(var) + "s. ")
 		stdout.flush()
