@@ -25,12 +25,12 @@ USERAGENT = "Automated moderator for /r/" + SUBREDDIT
 
 # How many posts to retrieve at once (max 100)
 MAXPOSTS = 10
-# How many seconds to wait inbetween cycles. Bot is inactive during this time.
+# How many seconds to wait between cycles. Bot is inactive during this time.
 WAIT = 60
 # Time before post is removed
 DELAY = 1200
 # WGW start
-WGWNUMBER = 8
+WGWNUMBER = 10
 # Toggles whether bot reports before removal
 TRUSTME = True
 
@@ -38,7 +38,7 @@ TRUSTME = True
 MODMSG = "http://www.reddit.com/message/compose?to=%2Fr%2F" + SUBREDDIT
 # Direct link for information about hosting
 HOSTLINK = "http://www.reddit.com/r/" + SUBREDDIT + "/wiki/info/rules#wiki_2.0_-_hosting"
-# Direct link for information about post catagories
+# Direct link for information about post categories
 CATLINK = "http://www.reddit.com/r/" + SUBREDDIT + "/wiki/info/rules#wiki_3.0_-_categorisation"
 # Markdown formatted link for details comment template
 TEMPLATE = "[details comment](http://www.reddit.com/r/" + SUBREDDIT + "/wiki/info/template)"
@@ -101,11 +101,11 @@ NOTAGREPLY = "Your post title appears to be missing a [tag]. " \
 			 "\n\n* Material requires [TYPE]{1}".format(CATLINK, CONTACT)
 
 # Message when using a deprecated tag
-DEPTAGREPLY = "Your post appeats to be using one of the deprecated " \
+DEPTAGREPLY = "Your post appears to be using one of the deprecated " \
 			  "[tags]. Please use a link flair instead." + CONTACT
 
 # Message when stating OS in a title tag
-OSREPLY = "Your post appeats to be using the OS [tag]. This is " \
+OSREPLY = "Your post appears to be using the OS [tag]. This is " \
 		  "now deprecated in favour of userflair." + CONTACT
 
 # Message when not using an approved host
@@ -119,8 +119,8 @@ DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
 # Post body for weekly thread
 WGWBODY = "In this thread users can post any screenshot, no matter " \
 		  "how close to default it may be, and any question, no mater " \
-		  "how stupid they think it may be. For this discussion rules " \
-		  "2.1-5, 2.7-9 and 3.1-2 are all laxed. This basically means " \
+		  "how stupid they think it may be. For this discussion we will " \
+		  "be lax in enforcing 2.1-5, 2.7-9 and 3.1-2. This basically means " \
 		  "you can post anything on topic, in any format you like, and " \
 		  "using any host. We hope this gives new users a chance to get " \
 		  "some help with any problems they're having and older users a " \
@@ -128,6 +128,11 @@ WGWBODY = "In this thread users can post any screenshot, no matter " \
 		  "\n\nPlease respect that the lax rules for WGW apply only " \
 		  "within this thread and normal submission rules still apply " \
 		  "for the main sub." + CONTACT
+
+# Message when user just comments '.'
+USESAVEPM = "You seem to be using a '.' comment to save threads. This is " \
+			"one of our most reported comment types and so has been removed." \
+			" Please use a bookmarking tool instead." + CONTACT
 
 print(SUBREDDIT, "bot\n")
 
@@ -250,6 +255,24 @@ def details_scan(post, pid, pauthor, ptime):
 		print(pid + ", " + pauthor + ": Ignoring Selfpost")
 
 
+def comments_check(post):
+	print("Checking comments...")
+	comments = helpers.flatten_tree(post.comments)
+	for comment in comments:
+		# Comment Properties
+		cid = "t3_" + comment.id
+		cbody = comment.body
+		try:
+			cauthor = comment.author.name
+		except AttributeError:
+			cauthor = "[deleted]"
+		# Checking Comment
+		if cbody = ".":
+			r.send_message(cauthor, "Comment in /r/" + SUBREDDIT, USESAVEPM)
+		else:
+			pass
+
+
 def actions(post):
 	# Post variables
 	pid = post.id
@@ -269,6 +292,7 @@ def actions(post):
 	tag_check(post, pid, pauthor, ptitle)
 	approve_host(post, pid, pauthor, purl)
 	flair_assign(post, pid, pauthor, purl, ptitle, flair)
+	comments_check(post)
 	if details_scan(post, pid, pauthor, ptime) == False:
 		pass
 	else:
@@ -294,7 +318,7 @@ while True:
 			else:
 				actions(post)
 	except Exception as e:
-		print("An error has occured\n", e)
+		print("An error has occurred\n", e)
 	for var in range(WAIT, 0, -1):
 		stdout.write("\rRunning again in " + str(var) + "s. ")
 		stdout.flush()
