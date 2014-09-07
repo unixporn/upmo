@@ -12,6 +12,8 @@ from time import sleep
 from datetime import datetime, timezone
 from praw import errors, helpers, Reddit
 
+
+
 """CONFIGURATION"""
 
 # Bot's Username
@@ -51,7 +53,7 @@ HWSTRING = ["[desktop]", "[laptop]", "[server]", "[phone]", "[tablet]", "[multi]
 TAGSTRING = ["[discussion]", "[help]", "[material]", "[meta]", "[oc]"]
 # Banned OS title tags
 OSSTRING = ["aix",
-			"android",
+			"android", "androidx86", "android x86"
 			"arch", "archlinux", "arch linux",
 			"bodhi",
 			"bsd",
@@ -81,12 +83,12 @@ OSSTRING = ["aix",
 			"parabola",
 			"plan9",
 			"slackware",
-			"ubuntu",
+			"ubuntu", "ubuntu gnome", "ubuntugnome",
 			"xubuntu"]
 OSSTRING = ["[" + OS + "]" for OS in OSSTRING]
 
 # Message about reporting bot errors
-CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed ^up)*".format(MODMSG)
+CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed ^up*".format(MODMSG)
 
 # Message when haven't added a details comment
 NODETAILS = "You have not provided a {0} so the post has been removed." \
@@ -159,7 +161,7 @@ while Trying:
 """DEFINING FUNCTIONS"""
 
 def slay(post, response):
-	print("Replying to " + post.id)
+	print("\tReplying to OP")
 	res = post.add_comment(response)
 	res.distinguish()
 	if TRUSTME == False: post.report()
@@ -172,12 +174,12 @@ def weekly_post():
 	now = datetime.now()
 	if now.weekday() == 5 and now.hour == 0 and now.minute == 0:
 		print("Creating weekend post...")
-		newpost = r.submit(SUBREDDIT, "\"Whatever Goes\" weekend #{0}".format(WGWNUMBER), text=WGWBODY)
+		newpost = r.submit(SUBREDDIT, "\"Whatever Goes\" weekend #" + WGWNUMBER, text=WGWBODY, captcha=None)
 		newpost.distinguish()
 		WGWNUMBER += 1
 
 
-def tag_check(post, pid, pauthor, ptitle):
+def tag_check(post, ptitle):
 	print("Checking tags...")
 	if any(key.lower() in ptitle for key in TAGSTRING):
 		slay(post, DEPTAGREPLY)
@@ -189,7 +191,7 @@ def tag_check(post, pid, pauthor, ptitle):
 		slay(post, NOTAGREPLY)
 
 
-def approve_host(post, pid, pauthor, purl):
+def approve_host(post, purl):
 	print("Verifying hosts...")
 	if any(domain in purl for domain in WHITELIST) or post.is_self == True:
 		pass
@@ -197,10 +199,10 @@ def approve_host(post, pid, pauthor, purl):
 		slay(post, HOSTRESPONSE)
 
 
-def flair_assign(post, pid, pauthor, purl, ptitle, flair):
+def flair_assign(post, purl, ptitle, flair):
 	print("Scanning for flairs...")
 	if flair == "":
-		print(pid + ": No Flair")
+		print("\tNo Flair")
 		if post.is_self == True:
 			print("\tAssigning 'Discussion' flair")
 			post.set_flair(flair_text="Discussion",flair_css_class="discussion")
@@ -213,18 +215,17 @@ def flair_assign(post, pid, pauthor, purl, ptitle, flair):
 		else:
 			print("\tAssigning 'Screenshot' flair")
 			post.set_flair(flair_text="Screenshot",flair_css_class="screenshot")
-		print(pid + ", " + pauthor + ": Flair Assigned")
+		print("\tFlair Assigned")
 	else:
-		print(pid + ", " + pauthor + ": Already Flaired")
+		print("\tAlready Flaired")
 
 
-def details_scan(post, pid, pauthor, ptime):
-	print("Checking details comments...")
+def details_scan(post, pauthor, ptime):
 	found = False
 	curtime = datetime.now(timezone.utc).timestamp()
 	if post.is_self == False:
+		print("Checking details comments...")
 		difference = curtime - ptime
-		print(pid + ", " + pauthor + ": Finding comments")
 		comments = helpers.flatten_tree(post.comments)
 		for comment in comments:
 			cid = "t3_" + comment.id
@@ -243,7 +244,7 @@ def details_scan(post, pid, pauthor, ptime):
 			elif difference > ( DELAY * 0.5 ):
 				commenters = [comment.author.name for comment in comments]
 				if (found == False) and ("upmo" not in commenters):
-					print("Warning OP")
+					print("\tWarning OP")
 					response = post.add_comment(DETAILSWARN)
 					response.distinguish()
 				return False
@@ -251,26 +252,6 @@ def details_scan(post, pid, pauthor, ptime):
 				differences = str("%.0f" % (DELAY - difference))
 				print("\tStill has " + differences + "s.")
 				return False
-	else:
-		print(pid + ", " + pauthor + ": Ignoring Selfpost")
-
-
-def comments_check(post):
-	print("Checking comments...")
-	comments = helpers.flatten_tree(post.comments)
-	for comment in comments:
-		# Comment Properties
-		cid = "t3_" + comment.id
-		cbody = comment.body
-		try:
-			cauthor = comment.author.name
-		except AttributeError:
-			cauthor = "[deleted]"
-		# Checking Comment
-		if cbody = ".":
-			r.send_message(cauthor, "Comment in /r/" + SUBREDDIT, USESAVEPM)
-		else:
-			pass
 
 
 def actions(post):
@@ -288,22 +269,20 @@ def actions(post):
 	except AttributeError:
 			flair = ""
 	# Post actions
-	print("\nScanning", pid)
-	tag_check(post, pid, pauthor, ptitle)
-	approve_host(post, pid, pauthor, purl)
-	flair_assign(post, pid, pauthor, purl, ptitle, flair)
-	comments_check(post)
-	if details_scan(post, pid, pauthor, ptime) == False:
+	print("\nScanning " + pid + " by " + pauthor)
+	tag_check(post, ptitle)
+	approve_host(post, purl)
+	flair_assign(post, purl, ptitle, flair)
+	if details_scan(post, pauthor, ptime) == False:
 		pass
 	else:
 		with open("oldposts","a+") as file:
 			file.write(pid + "\n")
 
 
-
 """RUNNING BOT"""
 
-print("Running on /r/{0}".format(SUBREDDIT))
+print("Running on /r/" + SUBREDDIT)
 while True:
 	print("\nRunning at " + str(datetime.now(timezone.utc)))
 	subreddit = r.get_subreddit(SUBREDDIT)
