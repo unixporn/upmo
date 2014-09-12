@@ -48,7 +48,7 @@ TEMPLATE = "[details comment](http://www.reddit.com/r/" + SUBREDDIT + "/wiki/inf
 # Website Whitelist
 WHITELIST = ["imgur.com", "minus.com", "gfycat.com", "pub.iotek.org", "u.teknik.io", "mediacru.sh"]
 # Strings for the "Hardware" flair
-HWSTRING = ["[desktop]", "[laptop]", "[server]", "[phone]", "[tablet]", "[multi]"]
+HWSTRING = ["[desktop]", "[laptop]", "[server]", "[phone]", "[tablet]", "[portable]", "[multi]"]
 # Title tags which shouldn't be used
 TAGSTRING = ["[discussion]", "[help]", "[material]", "[meta]", "[oc]"]
 # Banned OS title tags
