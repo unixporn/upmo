@@ -32,7 +32,7 @@ WAIT = 60
 # Time before post is removed
 DELAY = 1200
 # WGW start
-WGWNUMBER = 10
+WGWNUMBER = 11
 # Toggles whether bot reports before removal
 TRUSTME = True
 
@@ -111,9 +111,9 @@ OSREPLY = "Your post appears to be using the OS [tag]. This is " \
 		  "now deprecated in favour of userflair." + CONTACT
 
 # Message when not using an approved host
-HOSTRESPONSE = "You don't appear to be using an [approved host](). " \
+HOSTRESPONSE = "You don't appear to be using an [approved host]({0})." \
 			   "Please resubmit using one of them, but feel free to " \
-			   "leave mirrors to host in your details comment." + CONTACT
+			   "leave mirrors to host in your details comment.{1}".format(HOSTLINK, CONTACT) 
 
 # Warning when haven't added a details comment
 DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
@@ -278,6 +278,7 @@ def actions(post):
 	else:
 		with open("oldposts","a+") as file:
 			file.write(pid + "\n")
+
 
 
 """RUNNING BOT"""
