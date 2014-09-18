@@ -53,7 +53,7 @@ HWSTRING = ["[desktop]", "[laptop]", "[server]", "[phone]", "[tablet]", "[portab
 TAGSTRING = ["[discussion]", "[help]", "[material]", "[meta]", "[oc]"]
 # Banned OS title tags
 OSSTRING = ["aix",
-			"android", "androidx86", "android x86"
+			"android", "androidx86", "android x86",
 			"arch", "archlinux", "arch linux",
 			"bodhi",
 			"bsd",
@@ -100,7 +100,7 @@ NOTAGREPLY = "Your post title appears to be missing a [tag]. " \
 			 "See [section 3]({0}) for more details but briefly:" \
 			 "\n\n* Screenshots requires [WM/DE]\n\n* Workflow " \
 			 "requires [WM/DE]\n\n* Hardware requires [DEVICE]" \
-			 "\n\n* Material requires [TYPE]{1}".format(CATLINK, CONTACT)
+			 "\n\n* Material requires [OC]{1}".format(CATLINK, CONTACT)
 
 # Message when using a deprecated tag
 DEPTAGREPLY = "Your post appears to be using one of the deprecated " \
@@ -191,14 +191,6 @@ def tag_check(post, ptitle):
 		slay(post, NOTAGREPLY)
 
 
-def approve_host(post, purl):
-	print("Verifying hosts...")
-	if any(domain in purl for domain in WHITELIST) or post.is_self == True:
-		pass
-	else:
-		slay(post, HOSTRESPONSE)
-
-
 def flair_assign(post, purl, ptitle, flair):
 	print("Scanning for flairs...")
 	if flair == "":
@@ -209,6 +201,9 @@ def flair_assign(post, purl, ptitle, flair):
 		elif any(word in ptitle for word in HWSTRING):
 			print("\tAssigning 'Hardware' flair")
 			post.set_flair(flair_text="Hardware",flair_css_class="hardware")
+		elif "[oc]" in ptitle:
+			print("\tAssigning 'Material' flair")
+			post.set_flair(flair_text="Material",flair_css_class="material")
 		elif any(word in purl for word in [".webm", ".gif", "gfycat", ".mp4"]):
 			print("\tAssigning 'Workflow' flair")
 			post.set_flair(flair_text="Workflow",flair_css_class="workflow")
@@ -218,6 +213,18 @@ def flair_assign(post, purl, ptitle, flair):
 		print("\tFlair Assigned")
 	else:
 		print("\tAlready Flaired")
+
+
+def approve_host(post, purl, flair):
+	print("Verifying hosts...")
+	if any(domain in purl for domain in WHITELIST) or post.is_self == True:
+		pass
+	else:
+		# Materials currently exempt
+		if flair == Material:
+			pass
+		else:
+			slay(post, HOSTRESPONSE)
 
 
 def details_scan(post, pauthor, ptime):
@@ -271,8 +278,8 @@ def actions(post):
 	# Post actions
 	print("\nScanning " + pid + " by " + pauthor)
 	tag_check(post, ptitle)
-	approve_host(post, purl)
 	flair_assign(post, purl, ptitle, flair)
+	approve_host(post, purl, flair)
 	if details_scan(post, pauthor, ptime) == False:
 		pass
 	else:
