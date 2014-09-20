@@ -279,7 +279,7 @@ def actions(post):
 	print("\nScanning " + pid + " by " + pauthor)
 	tag_check(post, ptitle)
 	flair_assign(post, purl, ptitle, flair)
-	approve_host(post, purl, flair)
+	approve_host(post, purl, ptitle)
 	if details_scan(post, pauthor, ptime) == False:
 		pass
 	else:
