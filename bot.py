@@ -195,15 +195,15 @@ def flair_assign(post, purl, ptitle, flair):
 	print("Scanning for flairs...")
 	if flair == "":
 		print("\tNo Flair")
-		if post.is_self == True:
+		if "[oc]" in ptitle:
+			print("\tAssigning 'Material' flair")
+			post.set_flair(flair_text="Material",flair_css_class="material")
+		elif post.is_self == True:
 			print("\tAssigning 'Discussion' flair")
 			post.set_flair(flair_text="Discussion",flair_css_class="discussion")
 		elif any(word in ptitle for word in HWSTRING):
 			print("\tAssigning 'Hardware' flair")
 			post.set_flair(flair_text="Hardware",flair_css_class="hardware")
-		elif "[oc]" in ptitle:
-			print("\tAssigning 'Material' flair")
-			post.set_flair(flair_text="Material",flair_css_class="material")
 		elif any(word in purl for word in [".webm", ".gif", "gfycat", ".mp4"]):
 			print("\tAssigning 'Workflow' flair")
 			post.set_flair(flair_text="Workflow",flair_css_class="workflow")
