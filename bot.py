@@ -50,7 +50,7 @@ WHITELIST = ["imgur.com", "minus.com", "gfycat.com", "pub.iotek.org", "u.teknik.
 # Strings for the "Hardware" flair
 HWSTRING = ["[desktop]", "[laptop]", "[server]", "[phone]", "[tablet]", "[portable]", "[multi]"]
 # Title tags which shouldn't be used
-TAGSTRING = ["[discussion]", "[help]", "[material]", "[meta]", "[oc]"]
+TAGSTRING = ["[discussion]", "[help]", "[material]", "[meta]"]
 # Banned OS title tags
 OSSTRING = ["aix",
 			"android", "androidx86", "android x86",
@@ -221,7 +221,7 @@ def approve_host(post, purl, flair):
 		pass
 	else:
 		# Materials currently exempt
-		if flair == Material:
+		if flair == "Material":
 			pass
 		else:
 			slay(post, HOSTRESPONSE)
