@@ -215,13 +215,13 @@ def flair_assign(post, purl, ptitle, flair):
 		print("\tAlready Flaired")
 
 
-def approve_host(post, purl, flair):
+def approve_host(post, purl, ptitle):
 	print("Verifying hosts...")
 	if any(domain in purl for domain in WHITELIST) or post.is_self == True:
 		pass
 	else:
 		# Materials currently exempt
-		if flair == "Material":
+		if "[oc]" in ptitle:
 			pass
 		else:
 			slay(post, HOSTRESPONSE)
