@@ -1,6 +1,13 @@
 /u/upmo
-====
+=======
 
-This is an AutoMod bot which scans /r/unixporn for new posts while making sure that the rules are being followed. Most of the code originally comes from several separate bots written by /u/GoldenSights for various subs. From there they were reworked, merged and heavily modified to fit the subreddit needs. The major changes are the dynamic timer, use of a single text file instead of 5 SQL databases for history management, the warning added into the details comment checker, a weekly thread poster, and multiple flairs assignment.
+The AutoMod for the subreddit. [Click here for more information](https://www.reddit.com/r/upmo/comments/2hfl8p/what_is_uupmo/). Within /r/unixporn, /u/upmo carries out the following duties:
 
-All work is licensed under the MIT License and provided without any warranty.
+* Posting the weekly thread
+* Removes posts using deprecated tags
+* Removes posts using OS tags
+* Removes posts without DE tagged in title
+* Assigns correct link flair to posts
+* Checks links are through approved hosts
+* Warns user if they haven't added a details comment after 10 minutes
+* Removes posts which haven't added a details comment after 20 minutes
