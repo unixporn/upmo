@@ -30,7 +30,7 @@ MAXPOSTS = 10
 # inactive during this time.
 WAIT = 60
 # Time before post is removed
-DELAY = 1200
+DELAY = 1800
 # WGW start
 WGWNUMBER = 11
 # Toggles whether bot reports before removal
@@ -329,8 +329,11 @@ while True:
     print("\nRunning at " + str(datetime.now(timezone.utc)))
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_new(limit=MAXPOSTS)
-    with open("oldposts", "r") as file:
-        oldposts = [line.strip() for line in file]
+    try:
+        with open("oldposts", "r") as file:
+            oldposts = [line.strip() for line in file]
+    except:
+        oldposts = []
     try:
         weekly_post(WGWNUMBER)
         for post in posts:
