@@ -118,11 +118,11 @@ OSSTRING = ["aix",
 OSSTRING = ["[" + OS + "]" for OS in OSSTRING]
 
 # Message about reporting bot errors
-CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed" \
+CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed " \
           "^up*".format(MODMSG)
 
 # Message when haven't added a details comment
-NODETAILS = "You have not provided a {0} so the post has been removed." \
+NODETAILS = "You have not provided a {0} so the post has been removed. " \
             "Please add one and message the mod team so we can approve " \
             "your post.{1}".format(TEMPLATE, CONTACT)
 
@@ -142,7 +142,7 @@ OSREPLY = "Your post appears to be using the OS [tag]. This is " \
           "now deprecated in favour of userflair." + CONTACT
 
 # Message when not using an approved host
-HOSTRESPONSE = "You don't appear to be using an [approved host]({0})." \
+HOSTRESPONSE = "You don't appear to be using an [approved host]({0}). " \
                "Please resubmit using one of them, but feel free to " \
                "leave mirrors to host in your details comment.{1}"
 HOSTRESPONSE = HOSTRESPONSE.format(HOSTLINK, CONTACT)
