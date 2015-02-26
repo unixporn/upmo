@@ -1,9 +1,10 @@
 /u/upmo
 =======
 
-The AutoMod for the subreddit. [Click here for more information](https://www.reddit.com/r/upmo/comments/2hfl8p/what_is_uupmo/). Within /r/unixporn, /u/upmo carries out the following duties:
+/u/upmo (UnixPornMOderator) is a [Reddit](http://reddit.com/) bot written to automate some of the more menial tasks in subreddit moderation. Most of the functions originally come from a [collection of small bots](https://github.com/voussoir/reddit/) written by /u/GoldenSights for various different subreddits. From there they were reworked, merged and heavily modified to create what I thought a bot should be. The major changes are the addition of timed responses and the use of a single text file instead of multiple SQL databases for history management.
 
-* Posting the weekly thread
+Within /r/unixporn, /u/upmo carries out the following duties:
+
 * Removes posts using deprecated tags
 * Removes posts using OS tags
 * Removes posts without DE tagged in title
