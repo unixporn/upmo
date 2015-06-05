@@ -9,6 +9,7 @@
 # Required modules
 from sys import stdout
 from time import sleep
+from getpass import getpass
 from datetime import datetime, timezone
 from praw import errors, helpers, Reddit
 
@@ -17,8 +18,6 @@ from praw import errors, helpers, Reddit
 
 # Bot's Username
 USERNAME = "USERNAME"
-# Bot's Password
-PASSWORD = "PASSWORD"
 # Sub to scan for new posts
 SUBREDDIT = "SUBREDDIT"
 # Short description of what the bot does
@@ -177,6 +176,7 @@ r = Reddit(USERAGENT)
 Trying = True
 while Trying:
     try:
+        PASSWORD = getpass("Password: ")
         r.login(USERNAME, PASSWORD)
         print("Successfully logged in\n")
         Trying = False
