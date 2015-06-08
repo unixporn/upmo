@@ -51,7 +51,7 @@ TEMPLATE = TEMPLATE.format(RURL, SUBREDDIT)
 
 # Website Whitelist
 WHITELIST = ["imgur.com",
-             "minus.com",
+             "minus.com", "min.us",
              "gfycat.com",
              "pub.iotek.org",
              "u.teknik.io",
