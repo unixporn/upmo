@@ -30,8 +30,6 @@ MAXPOSTS = 10
 WAIT = 60
 # Time before post is removed
 DELAY = 1800
-# WGW start
-WGWNUMBER = 11
 # Toggles whether bot reports before removal
 TRUSTME = True
 
@@ -126,46 +124,30 @@ NODETAILS = "You have not provided a {0} so the post has been removed. " \
             "your post.{1}".format(TEMPLATE, CONTACT)
 
 # Message when not using a tag
-NOTAGREPLY = "Your post title appears to be missing a [tag]. " \
-             "See [section 3]({0}) for more details but briefly:" \
-             "\n\n* Screenshots requires [WM/DE]\n\n* Workflow " \
-             "requires [WM/DE]\n\n* Hardware requires [DEVICE]" \
-             "\n\n* Material requires [OC]{1}".format(CATLINK, CONTACT)
+NOTAGREPLY = "Your post appears to be missing a title [tag] so has " \
+             "been removed. See [section 3]({0}) for more details but " \
+             "briefly:\n\n* Screenshots requires [WM/DE]\n\n* Workflow " \
+             "requires [WM/DE]\n\n* Hardware requires [DEVICE]\n\n" \
+             "* Material requires [OC]{1}".format(CATLINK, CONTACT)
 
 # Message when using a deprecated tag
 DEPTAGREPLY = "Your post appears to be using one of the deprecated " \
-              "[tags]. Please use a link flair instead." + CONTACT
+              "[tags] so has been removed. The bot will automatically " \
+              "apply the relevant link flair to posts." + CONTACT
 
 # Message when stating OS in a title tag
-OSREPLY = "Your post appears to be using the OS [tag]. This is " \
-          "now deprecated in favour of userflair." + CONTACT
+OSREPLY = "Your post appears to be using the OS [tag] so has been " \
+          "removed. This is now deprecated in favour of userflair." + CONTACT
 
 # Message when not using an approved host
-HOSTRESPONSE = "You don't appear to be using an [approved host]({0}). " \
-               "Please resubmit using one of them, but feel free to " \
-               "leave mirrors to host in your details comment.{1}"
+HOSTRESPONSE = "You don't appear to be using an [approved host]({0}) " \
+               "so your post has been removed. Please resubmit using " \
+               "one of them, but feel free to leave mirrors to host " \
+               "in your details comment.{1}"
 HOSTRESPONSE = HOSTRESPONSE.format(HOSTLINK, CONTACT)
 
 # Warning when haven't added a details comment
 DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
-
-# Post body for weekly thread
-WGWBODY = "In this thread users can post any screenshot, no matter " \
-          "how close to default it may be, and any question, no mater " \
-          "how stupid they think it may be. For this discussion we will " \
-          "be lax in enforcing 2.1-5, 2.7-9 and 3.1-2. This basically means " \
-          "you can post anything on topic, in any format you like, and " \
-          "using any host. We hope this gives new users a chance to get " \
-          "some help with any problems they're having and older users a " \
-          "chance to show of their knowledge by helping those in need." \
-          "\n\nPlease respect that the lax rules for WGW apply only " \
-          "within this thread and normal submission rules still apply " \
-          "for the main sub." + CONTACT
-
-# Message when user just comments '.'
-USESAVEPM = "You seem to be using a '.' comment to save threads. This is " \
-            "one of our most reported comment types and so has been removed." \
-            " Please use a bookmarking tool instead." + CONTACT
 
 print(SUBREDDIT, "bot\n")
 
@@ -199,16 +181,6 @@ def slay(post, response):
     post.remove(spam=False)
     print("\tPost removed")
     sleep(5)
-
-
-def weekly_post(WGWNUMBER):
-    now = datetime.now()
-    if now.weekday() == 5 and now.hour == 0 and now.minute == 0:
-        print("Creating weekend post...")
-        title = "\"Whatever Goes\" weekend #" + WGWNUMBER
-        newpost = r.submit(SUBREDDIT, title, text=WGWBODY, captcha=None)
-        newpost.distinguish()
-        WGWNUMBER += 1
 
 
 def tag_check(post, ptitle):
@@ -279,7 +251,17 @@ def details_scan(post, pauthor, ptime):
                 print("\tFound comment by OP")
                 found = True
         if found is True:
-            print("\tComment is okay. Passing")
+            print("\tComment is okay")
+            post.approve()
+            # Deletes all /u/upmo comments
+            for comment in comments:
+                try:
+                    cauthor = comment.author.name
+                except AttributeError:
+                    cauthor = "[deleted]"
+                if cauthor == USERNAME:
+                    comment.delete()
+            print("\tDeleted old comments")
         else:
             if difference > DELAY:
                 slay(post, NODETAILS)
@@ -291,8 +273,12 @@ def details_scan(post, pauthor, ptime):
                     response.distinguish()
                 return False
             else:
-                differences = str("%.0f" % (DELAY - difference))
-                print("\tStill has " + differences + "s.")
+                if difference < (DELAY * 0.5):
+                    differences = str("%.0f" % ((DELAY * 0.5) - difference))
+                    print("\tStill has " + differences + "s before warning")
+                elif difference < DELAY:
+                    differences = str("%.0f" % (DELAY - difference))
+                    print("\tStill has " + differences + "s before removal")
                 return False
 
 
@@ -335,7 +321,6 @@ while True:
     except:
         oldposts = []
     try:
-        weekly_post(WGWNUMBER)
         for post in posts:
             if post.id in oldposts:
                 pass
