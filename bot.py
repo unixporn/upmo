@@ -252,7 +252,6 @@ def details_scan(post, pauthor, ptime):
                 found = True
         if found is True:
             print("\tComment is okay")
-            post.approve()
             # Deletes all /u/upmo comments
             for comment in comments:
                 try:
