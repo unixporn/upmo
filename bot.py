@@ -47,6 +47,28 @@ CATLINK = CATLINK.format(RURL, SUBREDDIT)
 TEMPLATE = "[details comment]({0}r/{1}/wiki/info/template)"
 TEMPLATE = TEMPLATE.format(RURL, SUBREDDIT)
 
+
+# The following function takes a list of strings and turns it
+# into a list of tags using a variety of brackets & seperators
+
+def fillout(list):
+    openers = ["[", "(", "{", "⟨"]
+    closers = ["]", ")", "}", "⟩"]
+    seperators = ["|", "·"]
+    newlist = []
+    for item in list:
+        for opener in openers:
+            closer = closers[openers.index(opener)]
+            toadd = [opener + item + closer,
+                     opener + " " + item + " " + closer]
+            for seperator in seperators:
+                toadd += [opener + item + seperator,
+                          seperator + item + closer,
+                          opener + " " + item + " " + seperator,
+                          seperator + " " + item + " " + closer]
+            newlist += toadd
+    return newlist
+
 # Website Whitelist
 WHITELIST = ["imgur.com",
              "minus.com", "min.us",
@@ -68,15 +90,16 @@ HWSTRING = ["[desktop]",
             "[multi]"]
 
 # Title tags which shouldn't be used
-TAGSTRING = ["[discussion]",
-             "[help]",
-             "[material]",
-             "[meta]",
-             "[question]",
-             "[screenshot]",
-             "[workflow]",
-             "[hardware]",
-             "[other]"]
+TAGSTRING = ["discussion",
+             "help",
+             "material",
+             "meta",
+             "question", "q",
+             "screenshot",
+             "workflow",
+             "hardware",
+             "other"]
+TAGSTRING = fillout(TAGSTRING)
 
 # Banned OS title tags
 OSSTRING = ["aix",
@@ -112,7 +135,7 @@ OSSTRING = ["aix",
             "slackware",
             "ubuntu", "ubuntu gnome", "ubuntugnome",
             "xubuntu"]
-OSSTRING = ["[" + OS + "]" for OS in OSSTRING]
+OSSTRING = fillout(OSSTRING)
 
 # Message about reporting bot errors
 CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed " \
