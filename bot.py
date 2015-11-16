@@ -135,6 +135,7 @@ OSSTRING = ["aix",
             "plan9",
             "slackware",
             "ubuntu", "ubuntu gnome", "ubuntugnome",
+            "windows", "windows 7", "windows 10", "win32",
             "xubuntu"]
 OSSTRING = fillout(OSSTRING)
 
