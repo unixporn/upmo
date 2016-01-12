@@ -83,23 +83,24 @@ EXTENSIONS = [".webm", ".gif", "gfycat", ".mp4"]
 # Strings for the "Hardware" flair
 HWSTRING = ["[desktop]",
             "[laptop]",
-            "[server]",
+            "[multi]",
             "[phone]",
-            "[tablet]",
             "[portable]",
-            "[multi]"]
+            "[server]",
+            "[tablet]"]
 
 # Title tags which shouldn't be used
 TAGSTRING = ["discussion",
+             "hardware",
              "help",
              "material",
              "meta",
+             "mod",
+             "other",
              "question", "q",
              "screenshot",
-             "workflow",
-             "hardware",
-             "mod",
-             "other"]
+             "unixporn",
+             "workflow"]
 TAGSTRING = fillout(TAGSTRING)
 
 # Banned OS title tags
