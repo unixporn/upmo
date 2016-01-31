@@ -54,7 +54,7 @@ TEMPLATE = TEMPLATE.format(RURL, SUBREDDIT)
 def fillout(list):
     openers = ["[", "(", "{", "⟨"]
     closers = ["]", ")", "}", "⟩"]
-    seperators = ["|", "·"]
+    seperators = ["|", "·", "+"]
     newlist = []
     for item in list:
         for opener in openers:
