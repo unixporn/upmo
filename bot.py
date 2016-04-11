@@ -99,6 +99,7 @@ TAGSTRING = ["discussion",
              "other",
              "question", "q",
              "screenshot",
+             "thread",
              "unixporn",
              "workflow"]
 TAGSTRING = fillout(TAGSTRING)
