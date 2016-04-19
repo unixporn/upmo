@@ -101,7 +101,8 @@ TAGSTRING = ["discussion",
              "screenshot",
              "thread",
              "unixporn",
-             "workflow"]
+             "workflow",
+             "wm/de", "wm", "de"]
 TAGSTRING = fillout(TAGSTRING)
 
 # Banned OS title tags
