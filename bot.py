@@ -74,7 +74,7 @@ WHITELIST = ["imgur.com",
              "minus.com", "min.us",
              "gfycat.com",
              "pub.iotek.org",
-             "u.teknik.io",
+             "u.teknik.io", "upload.teknik.io",
              "mediacru.sh"]
 
 # Workflow extensions
