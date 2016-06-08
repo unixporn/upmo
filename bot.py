@@ -75,7 +75,8 @@ WHITELIST = ["imgur.com",
              "gfycat.com",
              "pub.iotek.org",
              "u.teknik.io", "upload.teknik.io",
-             "mediacru.sh"]
+             "mediacru.sh",
+             "redditmetrics.com/r/unixporn"]
 
 # Workflow extensions
 EXTENSIONS = [".webm", ".gif", "gfycat", ".mp4"]
