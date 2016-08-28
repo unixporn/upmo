@@ -91,16 +91,16 @@ HWSTRING = ["[desktop]",
             "[tablet]"]
 
 # Title tags which shouldn't be used
-TAGSTRING = ["discussion",
+TAGSTRING = ["discussion", "discussions",
              "hardware",
-             "help",
-             "material",
+             "help", "request",
+             "material", "materials",
              "meta",
              "mod",
              "other",
              "question", "q",
-             "screenshot",
-             "thread",
+             "screenshot", "screenshots",
+             "thread", "threads",
              "unixporn",
              "workflow",
              "wm/de", "wm", "de"]
