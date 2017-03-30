@@ -70,7 +70,8 @@ def fillout(list):
     return newlist
 
 # Website Whitelist
-WHITELIST = ["imgur.com",
+WHITELIST = ["g.redditmedia.com", "i.redd.it", "i.reddituploads.com",
+             "imgur.com",
              "minus.com", "min.us",
              "gfycat.com",
              "pub.iotek.org",
