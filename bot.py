@@ -185,13 +185,12 @@ print(SUBREDDIT, "bot\n")
 """BOT LOGIN"""
 
 r = Reddit(USERAGENT)
-Trying = True
-while Trying:
+while True:
     try:
         PASSWORD = getpass("Password: ")
         r.login(USERNAME, PASSWORD)
         print("Successfully logged in\n")
-        Trying = False
+        break
     except errors.InvalidUserPass:
         print("Wrong Username or Password\n")
         quit()
