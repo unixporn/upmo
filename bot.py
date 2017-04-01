@@ -207,7 +207,7 @@ def slay(post, response):
     print("\tReplying to OP")
     res = post.add_comment(response)
     res.distinguish()
-    if TRUSTME is False:
+    if not TRUSTME:
         post.report()
     post.remove(spam=False)
     print("\tPost removed")
@@ -220,7 +220,7 @@ def tag_check(post, ptitle):
         slay(post, DEPTAGREPLY)
     elif any(key.lower() in ptitle for key in OSSTRING):
         slay(post, OSREPLY)
-    elif any(tag in ptitle for tag in ["[", "]"]) or post.is_self is True:
+    elif any(tag in ptitle for tag in ["[", "]"]) or post.is_self:
         pass
     else:
         slay(post, NOTAGREPLY)
@@ -233,7 +233,7 @@ def flair_assign(post, purl, ptitle, flair):
         if "[oc]" in ptitle:
             print("\tAssigning 'Material' flair")
             post.set_flair(flair_text="Material", flair_css_class="material")
-        elif post.is_self is True:
+        elif post.is_self:
             print("\tAssigning 'Discussion' flair")
             post.set_flair(flair_text="Discussion",
                            flair_css_class="discussion")
