@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
-# This is a modification and merge of several reddit bots
-# written by /u/GoldenSights for various subs. This is an
-# AutoMod bot which scans /r/unixporn for new posts while
-# making sure that the rules are being followed. All work
-# is licensed under the MIT License, without any warranty
+"""
+This is an AutoMod bot which scans r/unixporn for new posts while making sure
+that the rules are being followed. It's a modification & merge of several bots
+written by u/GoldenSights for various subs. MIT Licensed, without any warranty
+"""
 
 # Required modules
 from sys import stdout
@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from praw import errors, helpers, Reddit
 
 
-"""CONFIGURATION"""
+# CONFIGURATION
 
 # Bot's Username
 USERNAME = "USERNAME"
@@ -184,7 +184,7 @@ DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
 print(SUBREDDIT, "bot\n")
 
 
-"""BOT LOGIN"""
+# BOT LOGIN
 
 r = Reddit(USERAGENT)
 while True:
@@ -201,7 +201,7 @@ while True:
         sleep(5)
 
 
-"""DEFINING FUNCTIONS"""
+# DEFINING FUNCTIONS
 
 def slay(post, response):
     print("\tReplying to OP")
@@ -338,7 +338,7 @@ def actions(post):
     approve_host(post, purl, ptitle)
 
 
-"""RUNNING BOT"""
+# RUNNING BOT
 
 print("Running on /r/" + SUBREDDIT)
 while True:
