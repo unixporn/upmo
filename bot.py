@@ -48,10 +48,12 @@ TEMPLATE = "[details comment]({0}r/{1}/wiki/info/template)"
 TEMPLATE = TEMPLATE.format(RURL, SUBREDDIT)
 
 
-# The following function takes a list of strings and turns it
-# into a list of tags using a variety of brackets & seperators
-
 def fillout(list):
+    """
+    Takes a list of strings as input and returns a list of tags using a
+    variety of brackets & seperators
+    """
+
     openers = ["[", "(", "{", "⟨"]
     closers = ["]", ")", "}", "⟩"]
     seperators = ["|", "·", "+", "/", "\\"]
