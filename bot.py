@@ -112,6 +112,7 @@ TAGSTRING = fillout(TAGSTRING)
 # Banned OS title tags
 OSSTRING = ["aix",
             "android", "androidx86", "android x86",
+            "antergos",
             "arch", "archlinux", "arch linux",
             "bodhi",
             "bsd",
