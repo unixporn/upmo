@@ -35,17 +35,48 @@ TRUSTME = True
 
 # Reddit URL
 RURL = "https://www.reddit.com/"
+# Link to a Reddit's rule page
+RULELINK = RURL + SUBREDDIT + "/about/rules"
 # Direct link to send mod mail
 MODMSG = RURL + "message/compose?to=%2Fr%2F" + SUBREDDIT
-# Direct link for information about hosting
-HOSTLINK = "{0}r/{1}/wiki/info/rules#wiki_2.0_-_hosting"
-HOSTLINK = HOSTLINK.format(RURL, SUBREDDIT)
-# Direct link for information about post categories
-CATLINK = "{0}r/{1}/wiki/info/rules#wiki_3.0_-_categorisation"
-CATLINK = CATLINK.format(RURL, SUBREDDIT)
 # Markdown formatted link for details comment template
 TEMPLATE = "[details comment]({0}r/{1}/wiki/info/template)"
 TEMPLATE = TEMPLATE.format(RURL, SUBREDDIT)
+
+# Message about reporting bot errors
+CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed " \
+          "^up*".format(MODMSG)
+
+# Message when haven't added a details comment
+NODETAILS = "You have not provided a {0} so the post has been removed. " \
+            "Please add one and message the mod team so we can approve " \
+            "your post.{1}".format(TEMPLATE, CONTACT)
+
+# Message when not using a tag
+NOTAGREPLY = "Your post appears to be missing a title [tag] so has " \
+             "been removed. See [rule 4]({0}) for more details but " \
+             "briefly:\n\n* Screenshots requires [WM/DE]\n\n* Workflow " \
+             "requires [WM/DE]\n\n* Hardware requires [DEVICE]\n\n" \
+             "* Material requires [OC]{1}".format(RULELINK, CONTACT)
+
+# Message when using a deprecated tag
+DEPTAGREPLY = "Your post appears to be using one of the deprecated " \
+              "[tags] so has been removed. The bot will automatically " \
+              "apply the relevant link flair to posts." + CONTACT
+
+# Message when stating OS in a title tag
+OSREPLY = "Your post appears to be using the OS [tag] so has been " \
+          "removed. This is now deprecated in favour of userflair." + CONTACT
+
+# Message when not using an approved host
+HOSTRESPONSE = "You don't appear to be using an approved host: see " \
+               "[rule 2]({0}) for more details. Please resubmit using " \
+               "one of them, but feel free to leave mirrors to host " \
+               "in your details comment.{1}"
+HOSTRESPONSE = HOSTRESPONSE.format(RULELINK, CONTACT)
+
+# Warning when haven't added a details comment
+DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
 
 
 def fillout(list):
@@ -147,46 +178,10 @@ OSSTRING = ["aix",
             "xubuntu"]
 OSSTRING = fillout(OSSTRING)
 
-# Message about reporting bot errors
-CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed " \
-          "^up*".format(MODMSG)
-
-# Message when haven't added a details comment
-NODETAILS = "You have not provided a {0} so the post has been removed. " \
-            "Please add one and message the mod team so we can approve " \
-            "your post.{1}".format(TEMPLATE, CONTACT)
-
-# Message when not using a tag
-NOTAGREPLY = "Your post appears to be missing a title [tag] so has " \
-             "been removed. See [section 3]({0}) for more details but " \
-             "briefly:\n\n* Screenshots requires [WM/DE]\n\n* Workflow " \
-             "requires [WM/DE]\n\n* Hardware requires [DEVICE]\n\n" \
-             "* Material requires [OC]{1}".format(CATLINK, CONTACT)
-
-# Message when using a deprecated tag
-DEPTAGREPLY = "Your post appears to be using one of the deprecated " \
-              "[tags] so has been removed. The bot will automatically " \
-              "apply the relevant link flair to posts." + CONTACT
-
-# Message when stating OS in a title tag
-OSREPLY = "Your post appears to be using the OS [tag] so has been " \
-          "removed. This is now deprecated in favour of userflair." + CONTACT
-
-# Message when not using an approved host
-HOSTRESPONSE = "You don't appear to be using an [approved host]({0}) " \
-               "so your post has been removed. Please resubmit using " \
-               "one of them, but feel free to leave mirrors to host " \
-               "in your details comment.{1}"
-HOSTRESPONSE = HOSTRESPONSE.format(HOSTLINK, CONTACT)
-
-# Warning when haven't added a details comment
-DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
-
-print(SUBREDDIT, "bot\n")
-
 
 # BOT LOGIN
 
+print(SUBREDDIT, "bot\n")
 r = Reddit(USERAGENT)
 while True:
     try:
