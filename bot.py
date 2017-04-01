@@ -268,6 +268,7 @@ def details_scan(post, pauthor, ptime):
     False if future action on the post will be needed.
     """
 
+    print("Checking details comments...")
     comments = helpers.flatten_tree(post.comments)
     commenters = []
     for comment in comments:
