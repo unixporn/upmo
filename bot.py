@@ -8,7 +8,7 @@ written by u/GoldenSights for various subs. MIT Licensed, without any warranty
 
 # Required modules
 from sys import stdout
-from time import sleep
+from time import sleep, strftime
 from getpass import getpass
 from datetime import datetime, timezone
 from praw import errors, helpers, Reddit
@@ -25,9 +25,6 @@ USERAGENT = "Automated moderator for /r/" + SUBREDDIT
 
 # How many posts to retrieve at once (max 100)
 MAXPOSTS = 10
-# How many seconds to wait between running cycles. Bot is
-# inactive during this time.
-WAIT = 60
 # Time before post is removed
 DELAY = 1800
 # Toggles whether bot reports before removal
@@ -339,7 +336,7 @@ def actions(post):
 
 print("Running on /r/" + SUBREDDIT)
 while True:
-    print("\nRunning at " + str(datetime.now(timezone.utc)))
+    print("\nRunning at", strftime("%Y-%m-%d %H:%M:%S"))
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_new(limit=MAXPOSTS)
     try:
@@ -352,9 +349,13 @@ while True:
             pass
         else:
             actions(post)
-    for var in range(WAIT, 0, -1):
-        stdout.write("\rRunning again in " + str(var) + "s. ")
+
+    # Calculates seconds left in current minute
+    secs = 60 - int(strftime("%S"))
+    # Counts down until the next minute
+    for var in range(secs, 0, -1):
+        stdout.write("\rRunning again in %ss " % var)
         stdout.flush()
         sleep(1)
-    stdout.write("\r" + " "*28)
+    stdout.write("\r" + " "*28 + "\n")
     stdout.flush()
