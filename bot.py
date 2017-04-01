@@ -268,19 +268,22 @@ def approve_host(post, purl, ptitle):
 def details_scan(post, pauthor, ptime):
     found = False
     curtime = datetime.now(timezone.utc).timestamp()
-    if post.is_self is False:
+
+    if not post.is_self:
         print("Checking details comments...")
         difference = curtime - ptime
         comments = helpers.flatten_tree(post.comments)
+
         for comment in comments:
             try:
                 cauthor = comment.author.name
             except AttributeError:
                 cauthor = "[deleted]"
-            if cauthor == pauthor and found is False:
+            if cauthor == pauthor and not found:
                 print("\tFound comment by OP")
                 found = True
-        if found is True:
+
+        if found:
             print("\tComment is okay")
             # Deletes all /u/upmo comments
             for comment in comments:
@@ -291,16 +294,19 @@ def details_scan(post, pauthor, ptime):
                 if cauthor == USERNAME:
                     comment.delete()
             print("\tDeleted old comments")
+
         else:
             if difference > DELAY:
                 slay(post, NODETAILS)
+
             elif difference > (DELAY * 0.5):
                 commenters = [comment.author.name for comment in comments]
-                if (found is False) and ("upmo" not in commenters):
+                if "upmo" not in commenters:
                     print("\tWarning OP")
                     response = post.add_comment(DETAILSWARN)
                     response.distinguish()
                 return False
+
             else:
                 if difference < (DELAY * 0.5):
                     differences = str("%.0f" % ((DELAY * 0.5) - difference))
