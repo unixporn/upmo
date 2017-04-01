@@ -8,9 +8,8 @@ written by u/GoldenSights for various subs. MIT Licensed, without any warranty
 
 # Required modules
 from sys import stdout
-from time import sleep, strftime
+from time import sleep, strftime, time
 from getpass import getpass
-from datetime import datetime, timezone
 from praw import errors, helpers, Reddit
 
 
@@ -284,8 +283,7 @@ def details_scan(post, pauthor, ptime):
         return True
 
     else:
-        curtime = datetime.now(timezone.utc).timestamp()
-        difference = curtime - ptime
+        difference = time() - ptime
 
         if difference > DELAY:
             slay(post, NODETAILS)
