@@ -274,7 +274,7 @@ def details_scan(post, pauthor, ptime):
             commenters.append("[deleted]")
 
     if post.is_self:
-        print("\Self post so N/A")
+        print("\tSelf post so N/A")
         return True
 
     elif pauthor in commenters:
