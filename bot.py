@@ -68,8 +68,7 @@ OSREPLY = "Your post appears to be using the OS [tag] so has been " \
 HOSTRESPONSE = "You don't appear to be using an approved host: see " \
                "[rule 2]({0}) for more details. Please resubmit using " \
                "one of them, but feel free to leave mirrors to host " \
-               "in your details comment.{1}"
-HOSTRESPONSE = HOSTRESPONSE.format(RULELINK, CONTACT)
+               "in your details comment.{1}".format(RULELINK, CONTACT)
 
 # Warning when haven't added a details comment
 DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
