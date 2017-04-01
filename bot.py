@@ -254,14 +254,13 @@ def flair_assign(post, purl, ptitle, flair):
 
 def approve_host(post, purl, ptitle):
     print("Verifying hosts...")
-    if any(domain in purl for domain in WHITELIST) or post.is_self is True:
+    if any(domain in purl for domain in WHITELIST) or post.is_self:
+        pass
+    elif "[oc]" in ptitle:
+        # Materials can come from any website
         pass
     else:
-        # Materials currently exempt
-        if "[oc]" in ptitle:
-            pass
-        else:
-            slay(post, HOSTRESPONSE)
+        slay(post, HOSTRESPONSE)
 
 
 def details_scan(post, pauthor, ptime):
