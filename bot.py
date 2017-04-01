@@ -350,14 +350,11 @@ while True:
             oldposts = [line.strip() for line in file]
     except:
         oldposts = []
-    try:
-        for post in posts:
-            if post.id in oldposts:
-                pass
-            else:
-                actions(post)
-    except Exception as e:
-        print("An error has occurred\n", e)
+    for post in posts:
+        if post.id in oldposts:
+            pass
+        else:
+            actions(post)
     for var in range(WAIT, 0, -1):
         stdout.write("\rRunning again in " + str(var) + "s. ")
         stdout.flush()
