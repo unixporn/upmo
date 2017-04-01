@@ -266,55 +266,52 @@ def approve_host(post, purl, ptitle):
 
 
 def details_scan(post, pauthor, ptime):
-    found = False
-    curtime = datetime.now(timezone.utc).timestamp()
+    """
+    Function which check if a post contains a details comment and then takes
+    the appropriate action. Also returns True if done with post and returns
+    False if future action on the post will be needed.
+    """
 
-    if not post.is_self:
-        print("Checking details comments...")
+    comments = helpers.flatten_tree(post.comments)
+    commenters = []
+    for comment in comments:
+        try:
+            commenters.append(comment.author.name)
+        except AttributeError:
+            commenters.append("[deleted]")
+
+    if pauthor in commenters:
+        print("\tComment is okay")
+        # Deletes all the bot's comments
+        for comment, cauthor in zip(comments, commenters):
+            if cauthor == USERNAME:
+                comment.delete()
+        print("\tDeleted old bot comments")
+        return True
+
+    else:
+        curtime = datetime.now(timezone.utc).timestamp()
         difference = curtime - ptime
-        comments = helpers.flatten_tree(post.comments)
 
-        for comment in comments:
-            try:
-                cauthor = comment.author.name
-            except AttributeError:
-                cauthor = "[deleted]"
-            if cauthor == pauthor and not found:
-                print("\tFound comment by OP")
-                found = True
+        if difference > DELAY:
+            slay(post, NODETAILS)
+            return True
 
-        if found:
-            print("\tComment is okay")
-            # Deletes all /u/upmo comments
-            for comment in comments:
-                try:
-                    cauthor = comment.author.name
-                except AttributeError:
-                    cauthor = "[deleted]"
-                if cauthor == USERNAME:
-                    comment.delete()
-            print("\tDeleted old comments")
+        elif difference > (DELAY * 0.5):
+            commenters = [comment.author.name for comment in comments]
+            print("\tWarning OP")
+            response = post.add_comment(DETAILSWARN)
+            response.distinguish()
+            return False
 
         else:
-            if difference > DELAY:
-                slay(post, NODETAILS)
-
-            elif difference > (DELAY * 0.5):
-                commenters = [comment.author.name for comment in comments]
-                if "upmo" not in commenters:
-                    print("\tWarning OP")
-                    response = post.add_comment(DETAILSWARN)
-                    response.distinguish()
-                return False
-
-            else:
-                if difference < (DELAY * 0.5):
-                    differences = str("%.0f" % ((DELAY * 0.5) - difference))
-                    print("\tStill has " + differences + "s before warning")
-                elif difference < DELAY:
-                    differences = str("%.0f" % (DELAY - difference))
-                    print("\tStill has " + differences + "s before removal")
-                return False
+            if difference < (DELAY * 0.5):
+                differences = str("%.0f" % ((DELAY * 0.5) - difference))
+                print("\tStill has " + differences + "s before warning")
+            elif difference < DELAY:
+                differences = str("%.0f" % (DELAY - difference))
+                print("\tStill has " + differences + "s before removal")
+            return False
 
 
 def actions(post):
@@ -333,14 +330,12 @@ def actions(post):
             flair = ""
     # Post actions
     print("\nScanning " + pid + " by " + pauthor)
-    tag_check(post, ptitle)
     flair_assign(post, purl, ptitle, flair)
-    approve_host(post, purl, ptitle)
-    if details_scan(post, pauthor, ptime) is False:
-        pass
-    else:
+    if details_scan(post, pauthor, ptime):
         with open("oldposts", "a+") as file:
             file.write(pid + "\n")
+    tag_check(post, ptitle)
+    approve_host(post, purl, ptitle)
 
 
 """RUNNING BOT"""
