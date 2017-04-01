@@ -20,7 +20,7 @@ USERNAME = "USERNAME"
 # Sub to scan for new posts
 SUBREDDIT = "SUBREDDIT"
 # Short description of what the bot does
-USERAGENT = "Automated moderator for /r/" + SUBREDDIT
+USERAGENT = "Automated moderator for r/" + SUBREDDIT
 
 # How many posts to retrieve at once (max 100)
 MAXPOSTS = 10
@@ -273,7 +273,11 @@ def details_scan(post, pauthor, ptime):
         except AttributeError:
             commenters.append("[deleted]")
 
-    if pauthor in commenters:
+    if post.is_self:
+        print("\Self post so N/A")
+        return True
+
+    elif pauthor in commenters:
         print("\tComment is okay")
         # Deletes all the bot's comments
         for comment, cauthor in zip(comments, commenters):
@@ -332,7 +336,7 @@ def actions(post):
 
 # RUNNING BOT
 
-print("Running on /r/" + SUBREDDIT)
+print("Running on r/" + SUBREDDIT)
 while True:
     print("\nRunning at", strftime("%Y-%m-%d %H:%M:%S"))
     subreddit = r.get_subreddit(SUBREDDIT)
