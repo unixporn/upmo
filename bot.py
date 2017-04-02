@@ -293,7 +293,7 @@ def details_scan(post, pauthor, ptime):
             slay(post, NODETAILS)
             return True
 
-        elif difference > (DELAY * 0.5):
+        elif (difference > (DELAY * 0.5)) and ("upmo" not in commenters):
             commenters = [comment.author.name for comment in comments]
             print("\tWarning OP")
             response = post.add_comment(DETAILSWARN)
