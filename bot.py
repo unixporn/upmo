@@ -97,14 +97,13 @@ def fillout(list):
             newlist += toadd
     return newlist
 
+
 # Website Whitelist
 WHITELIST = ["g.redditmedia.com", "i.redd.it", "i.reddituploads.com",
              "imgur.com",
-             "minus.com", "min.us",
              "gfycat.com",
              "pub.iotek.org",
              "u.teknik.io", "upload.teknik.io", "v.teknik.io",
-             "mediacru.sh",
              "redditmetrics.com/r/unixporn"]
 
 # Workflow extensions
