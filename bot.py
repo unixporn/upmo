@@ -32,7 +32,7 @@ TRUSTME = True
 # Reddit URL
 RURL = "https://www.reddit.com/"
 # Link to a Reddit's rule page
-RULELINK = RURL + SUBREDDIT + "/about/rules"
+RULELINK = RURL + "r/" + SUBREDDIT + "/about/rules"
 # Direct link to send mod mail
 MODMSG = RURL + "message/compose?to=%2Fr%2F" + SUBREDDIT
 # Markdown formatted link for details comment template
