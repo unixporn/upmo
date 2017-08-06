@@ -70,6 +70,15 @@ HOSTRESPONSE = "You don't appear to be using an approved host: see " \
                "one of them, but feel free to leave mirrors to host " \
                "in your details comment.{1}".format(RULELINK, CONTACT)
 
+# Post body for the weekly thread
+THREADBODY = "In this thread users can post any screenshot, no matter " \
+             "how close to default it may be, and any question, no mater " \
+             "how stupid they think it may be. You can post anything on " \
+             "topic, in any format you like, and using any host. We hope " \
+             "this gives new users a chance to get some help with any " \
+             "problems they're having and older users a chance to show " \
+             "off their knowledge by helping those in need."
+
 # Warning when haven't added a details comment
 DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
 
@@ -332,6 +341,12 @@ def actions(post):
     approve_host(post, purl, ptitle)
 
 
+def weekly_thread():
+    print("Posting weekly thread...")
+    sub = r.get_subreddit("upmo")
+    thread = sub.submit("Weekly Whatever Thread #test", selftext=THREADBODY)
+
+
 # RUNNING BOT
 
 print("Running on r/" + SUBREDDIT)
@@ -339,15 +354,18 @@ while True:
     print("\nRunning at", strftime("%Y-%m-%d %H:%M:%S"))
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_new(limit=MAXPOSTS)
+
+    if strftime("%a %H:%M") == "Tue 21:00":
+        weekly_thread()
+
     try:
         with open("oldposts", "r") as file:
             oldposts = [line.strip() for line in file]
     except:
         oldposts = []
+
     for post in posts:
-        if post.id in oldposts:
-            pass
-        else:
+        if post.id not in oldposts:
             actions(post)
 
     # Calculates seconds left in current minute
