@@ -28,6 +28,8 @@ MAXPOSTS = 10
 DELAY = 1800
 # Toggles whether bot reports before removal
 TRUSTME = True
+# Time to post weekly threads
+THREADTIME = "21:00"
 
 # Reddit URL
 RURL = "https://www.reddit.com/"
@@ -38,6 +40,9 @@ MODMSG = RURL + "message/compose?to=%2Fr%2F" + SUBREDDIT
 # Markdown formatted link for details comment template
 TEMPLATE = "[details comment]({0}r/{1}/wiki/info/template)"
 TEMPLATE = TEMPLATE.format(RURL, SUBREDDIT)
+
+
+# MESSAGES
 
 # Message about reporting bot errors
 CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed " \
@@ -70,18 +75,40 @@ HOSTRESPONSE = "You don't appear to be using an approved host: see " \
                "one of them, but feel free to leave mirrors to host " \
                "in your details comment.{1}".format(RULELINK, CONTACT)
 
-# Post body for the weekly thread
-THREADBODY = "In this thread users can post any screenshot, no matter " \
-             "how close to default it may be, and any question, no mater " \
-             "how stupid they think it may be. You can post anything on " \
-             "topic, in any format you like, and using any host. We hope " \
-             "this gives new users a chance to get some help with any " \
-             "problems they're having and older users a chance to show " \
-             "off their knowledge by helping those in need."
-
 # Warning when haven't added a details comment
 DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
 
+# Set threads to be posted on a weekly basis
+THREADS = {
+    "Mon": {
+        "title": "Mockup Mondays",
+        "body": "Got an idea for a great new theme or even a whole setup? "
+                "Then this is the thread for you! Whether it's just sharing "
+                "an idea, requests, or an illustration of the whole shebang "
+                "want to know what you'd like your setup to look like. Just "
+                "comment below and lets get the talk rolling. Shout out to "
+                "our friends over at r/unixmockups who are making a sub "
+                "dedicated to the sharing of these."
+                "\n\n"
+                "If you've already got a work in progress version of your "
+                "creation then please [share it with us]({}) as a post, we'd"
+                "love to see it! Remember to tag [OC] in the title so that "
+                "u/upmo can do its thing".format(RURL + SUBREDDIT + "/submit")
+    },
+    "Wed": {
+        "title": "Whatever Wednesdays",
+        "body": "In this thread users can post any screenshot, no matter "
+                "how close to default it may be, and any question, no mater "
+                "how stupid they think it may be. You can post anything on "
+                "topic, in any format you like, and using any host. We hope "
+                "this gives new users a chance to get some help with any "
+                "problems they're having and older users a chance to show "
+                "off their knowledge by helping those in need."
+    }
+}
+
+
+# DATA
 
 def fillout(list):
     """
@@ -341,10 +368,13 @@ def actions(post):
     approve_host(post, purl, ptitle)
 
 
-def weekly_thread():
-    print("Posting weekly thread...")
-    sub = r.get_subreddit("upmo")
-    thread = sub.submit("Weekly Whatever Thread #test", selftext=THREADBODY)
+def weekly_thread(thread):
+    print("Getting weekly thread...")
+    sub = r.get_subreddit(SUBREDDIT)
+    title = "{} {}".format(thread["title"], strftime("%Y-%m-%d"))
+    print("\tPosting", title, "thread")
+    thread = sub.submit(title, selftext=thread["body"])
+    print("\Done!")
 
 
 # RUNNING BOT
@@ -355,8 +385,9 @@ while True:
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_new(limit=MAXPOSTS)
 
-    if strftime("%a %H:%M") == "Tue 21:00":
-        weekly_thread()
+    day = strftime("%a")
+    if strftime("%H:%M") == THREADTIME and day in THREADS:
+        weekly_thread(THREADS[day])
 
     try:
         with open("oldposts", "r") as file:
