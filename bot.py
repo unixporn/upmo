@@ -99,15 +99,27 @@ def fillout(list):
 
 
 # Website Whitelist
-WHITELIST = ["g.redditmedia.com", "i.redd.it", "i.reddituploads.com",
-             "imgur.com",
-             "gfycat.com",
-             "pub.iotek.org",
-             "u.teknik.io", "upload.teknik.io", "v.teknik.io",
-             "redditmetrics.com/r/unixporn"]
+WHITELIST = [
+    # Reddit
+    "g.redditmedia.com",
+    "i.redd.it",
+    "i.reddituploads.com",
+    "v.redd.it",
+    # Imgur
+    "imgur.com",
+    # Gfycat
+    "gfycat.com",
+    # IOPaste
+    "pub.iotek.org",
+    # Teknik
+    "u.teknik.io",
+    "upload.teknik.io",
+    "v.teknik.io",
+    "redditmetrics.com/r/unixporn"
+]
 
 # Workflow extensions
-EXTENSIONS = [".webm", ".gif", "gfycat", ".mp4"]
+EXTENSIONS = [".webm", ".gif", "gfycat", ".mp4", "v.redd.it"]
 
 # Strings for the "Hardware" flair
 HWSTRING = ["[desktop]",
