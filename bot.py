@@ -123,7 +123,8 @@ WHITELIST = [
     # "upload.teknik.io",
     # "v.teknik.io",
     # Other
-    "redditmetrics.com/r/unixporn"
+    "redditmetrics.com/r/unixporn",
+    "reddit.com/r/trendingsubreddits"
 ]
 
 # Workflow extensions
