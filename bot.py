@@ -250,9 +250,9 @@ def karma_check(post, pauthor):
 	if pauthor.link_karma < 5:
 		slay(post, KARMARM)
 		post.report()
-		print("KARMA KO - Post removed")
+		print("\tKARMA KO - Post removed")
 	else:
-		print("Karma OK")
+		print("\tKarma OK")
 
 
 def flair_assign(post, purl, ptitle, flair):
