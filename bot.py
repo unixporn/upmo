@@ -48,6 +48,10 @@ NODETAILS = "You have not provided a {0} so the post has been removed. " \
             "Please add one and message the mod team so we can approve " \
             "your post.{1}".format(TEMPLATE, CONTACT)
 
+# Message when karma is not high enough
+KARMARM = "Your post was caught in our spam filter, moderators have " \
+					"been notified and will come back to you if needed." + CONTACT
+
 # Message when not using a tag
 NOTAGREPLY = "Your post appears to be missing a title [tag] so has " \
              "been removed. See [rule 4]({0}) for more details but " \
@@ -236,7 +240,19 @@ def tag_check(post, ptitle):
     else:
         slay(post, NOTAGREPLY)
 
-
+def karma_check(post, pauthor):
+	"""
+	This function will check the author's karma. If it is < 5, the post is removed,
+	post is reported and a comment is posted to inform the author.
+	"""
+	print("Checking karma...")
+	if pauthor.link_karma < 5:
+		slay(post, KARMARM)
+		post.report()
+		print("KARMA KO - Post removed")
+	else:
+		print("Karma OK")
+	
 def flair_assign(post, purl, ptitle, flair):
     print("Scanning for flairs...")
     if flair == "":
@@ -277,7 +293,6 @@ def approve_host(post, purl, ptitle):
         pass
     else:
         slay(post, HOSTRESPONSE)
-
 
 def details_scan(post, pauthor, ptime):
     """
@@ -331,7 +346,6 @@ def details_scan(post, pauthor, ptime):
                 print("\tStill has " + differences + "s before removal")
             return False
 
-
 def actions(post):
     # Post variables
     pid = post.id
@@ -354,6 +368,7 @@ def actions(post):
             file.write(pid + "\n")
     tag_check(post, ptitle)
     approve_host(post, purl, ptitle)
+		karma_check(post, pauthor)
 
 
 # RUNNING BOT
