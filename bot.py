@@ -349,19 +349,26 @@ def actions(post):
 
 print("Running on r/" + SUBREDDIT)
 while True:
-    print("\nRunning at", strftime("%Y-%m-%d %H:%M:%S"))
-    subreddit = r.subreddit(SUBREDDIT)
-    posts = subreddit.new(limit=MAXPOSTS)
     try:
-        with open("oldposts", "r") as file:
-            oldposts = [line.strip() for line in file]
-    except:
-        oldposts = []
-    for post in posts:
-        if post.id in oldposts:
-            pass
-        else:
-            actions(post)
+        print("\nRunning at", strftime("%Y-%m-%d %H:%M:%S"))
+        subreddit = r.subreddit(SUBREDDIT)
+        posts = subreddit.new(limit=MAXPOSTS)
+
+        try:
+            with open("oldposts", "r") as file:
+                oldposts = [line.strip() for line in file]
+        except:
+            oldposts = []
+        for post in posts:
+            if post.id in oldposts:
+                pass
+            else:
+                actions(post)
+
+    except Exception as e:
+        log = strftime("%Y-%m-%d %H:%M:%S") + " " + str(e) + " " + str(type(e))
+        with open("errors", "a") as file:
+            file.write(log)
 
     # Calculates seconds left in current minute
     secs = 60 - int(strftime("%S"))
