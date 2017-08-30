@@ -10,7 +10,7 @@ written by u/GoldenSights for various subs. MIT Licensed, without any warranty
 from sys import stdout
 from time import sleep, strftime, time
 from getpass import getpass
-from praw import errors, helpers, Reddit
+from praw import Reddit
 
 
 # CONFIGURATION
@@ -197,30 +197,23 @@ OSSTRING = fillout(OSSTRING)
 # BOT LOGIN
 
 print(SUBREDDIT, "bot\n")
-r = Reddit(USERAGENT)
-while True:
-    try:
-        PASSWORD = getpass("Password: ")
-        r.login(USERNAME, PASSWORD)
-        print("Successfully logged in\n")
-        break
-    except errors.InvalidUserPass:
-        print("Wrong Username or Password\n")
-        quit()
-    except Exception as e:
-        print("%s" % e)
-        sleep(5)
+r = Reddit(client_id=getpass("ID: "),
+           client_secret=getpass("Secret: "),
+           user_agent=USERAGENT,
+           username=USERNAME,
+           password=getpass("Password: "))
 
 
 # DEFINING FUNCTIONS
 
 def slay(post, response):
     print("\tReplying to OP")
-    res = post.add_comment(response)
-    res.distinguish()
+    res = post.reply(response)
+    res.mod.distinguish(sticky=True)
     if not TRUSTME:
+        print("\tReporting to mods")
         post.report()
-    post.remove(spam=False)
+    post.mod.remove(spam=False)
     print("\tPost removed")
     sleep(5)
 
@@ -243,23 +236,19 @@ def flair_assign(post, purl, ptitle, flair):
         print("\tNo Flair")
         if "[oc]" in ptitle:
             print("\tAssigning 'Material' flair")
-            post.set_flair(flair_text="Material", flair_css_class="material")
+            post.flair.select("d4539c64-1185-11e4-8276-12313b0d3999")
         elif post.is_self:
             print("\tAssigning 'Discussion' flair")
-            post.set_flair(flair_text="Discussion",
-                           flair_css_class="discussion")
+            post.flair.select("3ca0392e-016b-11e4-9698-12313b0ea137")
         elif any(word in ptitle for word in HWSTRING):
             print("\tAssigning 'Hardware' flair")
-            post.set_flair(flair_text="Hardware",
-                           flair_css_class="hardware")
+            post.flair.select("dcf2ee38-1185-11e4-8b85-12313d195526")
         elif any(word in purl for word in EXTENSIONS):
             print("\tAssigning 'Workflow' flair")
-            post.set_flair(flair_text="Workflow",
-                           flair_css_class="workflow")
+            post.flair.select("3a672136-016b-11e4-ac17-12313b0e95bd")
         else:
             print("\tAssigning 'Screenshot' flair")
-            post.set_flair(flair_text="Screenshot",
-                           flair_css_class="screenshot")
+            post.flair.select("30184610-016b-11e4-b64a-12313b0a9e38")
         print("\tFlair Assigned")
     else:
         print("\tAlready Flaired")
@@ -287,7 +276,7 @@ def details_scan(post, pauthor, ptime):
     """
 
     print("Checking details comments...")
-    comments = helpers.flatten_tree(post.comments)
+    comments = post.comments.list()
     commenters = []
     for comment in comments:
         try:
@@ -318,8 +307,8 @@ def details_scan(post, pauthor, ptime):
         elif (difference > (DELAY * 0.5)) and ("upmo" not in commenters):
             commenters = [comment.author.name for comment in comments]
             print("\tWarning OP")
-            response = post.add_comment(DETAILSWARN)
-            response.distinguish()
+            response = post.reply(DETAILSWARN)
+            response.mod.distinguish(sticky=True)
             return False
 
         else:
@@ -361,8 +350,8 @@ def actions(post):
 print("Running on r/" + SUBREDDIT)
 while True:
     print("\nRunning at", strftime("%Y-%m-%d %H:%M:%S"))
-    subreddit = r.get_subreddit(SUBREDDIT)
-    posts = subreddit.get_new(limit=MAXPOSTS)
+    subreddit = r.subreddit(SUBREDDIT)
+    posts = subreddit.new(limit=MAXPOSTS)
     try:
         with open("oldposts", "r") as file:
             oldposts = [line.strip() for line in file]
