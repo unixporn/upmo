@@ -48,6 +48,10 @@ NODETAILS = "You have not provided a {0} so the post has been removed. " \
             "Please add one and message the mod team so we can approve " \
             "your post.{1}".format(TEMPLATE, CONTACT)
 
+# Message when karma is not high enough
+KARMARM = "Your post has been caught in our spam filter. The mods have been " \
+          "notified and will get back to you as soon as possible." + CONTACT
+
 # Message when not using a tag
 NOTAGREPLY = "Your post appears to be missing a title [tag] so has " \
              "been removed. See [rule 4]({0}) for more details but " \
@@ -230,6 +234,21 @@ def tag_check(post, ptitle):
         slay(post, NOTAGREPLY)
 
 
+def karma_check(post, pauthor):
+    """
+    Checks if the author's combined link and comment karma is < 5. If so
+    the post is removed, reported, and a comment is posted to inform OP
+    """
+    print("Checking karma...")
+    user = r.redditor(pauthor)
+    if user.link_karma + user.comment_karma < 5:
+        print("\tKARMA KO")
+        slay(post, KARMARM)
+        post.report()
+    else:
+        print("\tKarma OK")
+
+
 def flair_assign(post, purl, ptitle, flair):
     print("Scanning for flairs...")
     if flair == "":
@@ -343,6 +362,7 @@ def actions(post):
             file.write(pid + "\n")
     tag_check(post, ptitle)
     approve_host(post, purl, ptitle)
+    karma_check(post, pauthor)
 
 
 # RUNNING BOT
