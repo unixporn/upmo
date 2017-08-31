@@ -29,12 +29,14 @@ DELAY = 1800
 # Toggles whether bot reports before removal
 TRUSTME = True
 # Time to post weekly threads
-THREADTIME = "21:00"
+THREADTIME = "06:00"
 
 # Reddit URL
 RURL = "https://www.reddit.com/"
 # Link to a Reddit's rule page
 RULELINK = RURL + SUBREDDIT + "/about/rules"
+# Direct link to submit a post
+SUBMITURL = RURL + "r/" + SUBREDDIT + "/submit"
 # Direct link to send mod mail
 MODMSG = RURL + "message/compose?to=%2Fr%2F" + SUBREDDIT
 # Markdown formatted link for details comment template
@@ -81,7 +83,7 @@ DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
 # Set threads to be posted on a weekly basis
 THREADS = {
     "Mon": {
-        "title": "Mockup Mondays",
+        "title": "Mockup Monday",
         "body": "Got an idea for a great new theme or even a whole setup? "
                 "Then this is the thread for you! Whether it's just sharing "
                 "an idea, requests, or an illustration of the whole shebang "
@@ -93,17 +95,16 @@ THREADS = {
                 "If you've already got a work in progress version of your "
                 "creation then please [share it with us]({}) as a post, we'd"
                 "love to see it! Remember to tag [OC] in the title so that "
-                "u/upmo can do its thing".format(RURL + SUBREDDIT + "/submit")
+                "u/upmo can do its thing{}".format(SUBMITURL, CONTACT)
     },
-    "Wed": {
-        "title": "Whatever Wednesdays",
-        "body": "In this thread users can post any screenshot, no matter "
-                "how close to default it may be, and any question, no mater "
-                "how stupid they think it may be. You can post anything on "
-                "topic, in any format you like, and using any host. We hope "
-                "this gives new users a chance to get some help with any "
-                "problems they're having and older users a chance to show "
-                "off their knowledge by helping those in need."
+    "Fri": {
+        "title": "Weekly Workshop",
+        "body": "This is a thread to get answers for all your questions, no "
+                "mater how stupid you think it may be. You can also post "
+                "anything on topic, in any format you like, and using any "
+                "host. We hope this gives new users a chance to get some help "
+                "with any problems they're having and older users a chance to "
+                "show off their knowledge by helping those in need." + CONTACT
     }
 }
 
@@ -368,13 +369,16 @@ def actions(post):
     approve_host(post, purl, ptitle)
 
 
-def weekly_thread(thread):
+def weekly_thread(sub, thread):
+    """
+    If a thread exists in the THREADS dictionary for the current day, then at
+    the THREADTIME that thread is posted to the sub as the bottom sticky
+    """
     print("Getting weekly thread...")
-    sub = r.get_subreddit(SUBREDDIT)
     title = "{} {}".format(thread["title"], strftime("%Y-%m-%d"))
     print("\tPosting", title, "thread")
-    thread = sub.submit(title, selftext=thread["body"])
-    print("\Done!")
+    thread = sub.submit(title, selftext=thread["body"]).mod.sticky(bottom=True)
+    print("\tDone!")
 
 
 # RUNNING BOT
@@ -387,7 +391,7 @@ while True:
 
     day = strftime("%a")
     if strftime("%H:%M") == THREADTIME and day in THREADS:
-        weekly_thread(THREADS[day])
+        weekly_thread(subreddit, THREADS[day])
 
     try:
         with open("oldposts", "r") as file:
