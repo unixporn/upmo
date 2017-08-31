@@ -216,7 +216,7 @@ def slay(post, response):
     res.mod.distinguish(sticky=True)
     if not TRUSTME:
         print("\tReporting to mods")
-        post.report()
+        post.report("Reason in comments")
     post.mod.remove(spam=False)
     print("\tPost removed")
     sleep(5)
@@ -244,7 +244,7 @@ def karma_check(post, pauthor):
     if user.link_karma + user.comment_karma < 5:
         print("\tKARMA KO")
         slay(post, KARMARM)
-        post.report()
+        post.report("Low karma OP")
     else:
         print("\tKarma OK")
 
