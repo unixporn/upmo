@@ -10,7 +10,7 @@ written by u/GoldenSights for various subs. MIT Licensed, without any warranty
 from sys import stdout
 from time import sleep, strftime, time
 from getpass import getpass
-from praw import errors, helpers, Reddit
+from praw import Reddit
 
 
 # CONFIGURATION
@@ -34,7 +34,7 @@ THREADTIME = "06:00"
 # Reddit URL
 RURL = "https://www.reddit.com/"
 # Link to a Reddit's rule page
-RULELINK = RURL + SUBREDDIT + "/about/rules"
+RULELINK = RURL + "r/" + SUBREDDIT + "/about/rules"
 # Direct link to submit a post
 SUBMITURL = RURL + "r/" + SUBREDDIT + "/submit"
 # Direct link to send mod mail
@@ -54,6 +54,10 @@ CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed " \
 NODETAILS = "You have not provided a {0} so the post has been removed. " \
             "Please add one and message the mod team so we can approve " \
             "your post.{1}".format(TEMPLATE, CONTACT)
+
+# Message when karma is not high enough
+KARMARM = "Your post has been caught in our spam filter. The mods have been " \
+          "notified and will get back to you as soon as possible." + CONTACT
 
 # Message when not using a tag
 NOTAGREPLY = "Your post appears to be missing a title [tag] so has " \
@@ -76,6 +80,13 @@ HOSTRESPONSE = "You don't appear to be using an approved host: see " \
                "[rule 2]({0}) for more details. Please resubmit using " \
                "one of them, but feel free to leave mirrors to host " \
                "in your details comment.{1}".format(RULELINK, CONTACT)
+
+# Message when people post with Teknik
+TEKNIKPST = "https://redd.it/6ln5km"
+TEKNIKMSG = "Teknik is one of our approved hosts but is currently " \
+            "experiencing some [technical difficulties]({0}). While " \
+            "this issue is being resolved plase repost using [another "\
+            "host]({1}).{2}".format(TEKNIKPST, RULELINK, CONTACT)
 
 # Warning when haven't added a details comment
 DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
@@ -136,15 +147,29 @@ def fillout(list):
 
 
 # Website Whitelist
-WHITELIST = ["g.redditmedia.com", "i.redd.it", "i.reddituploads.com",
-             "imgur.com",
-             "gfycat.com",
-             "pub.iotek.org",
-             "u.teknik.io", "upload.teknik.io", "v.teknik.io",
-             "redditmetrics.com/r/unixporn"]
+WHITELIST = [
+    # Reddit
+    "g.redditmedia.com",
+    "i.redd.it",
+    "i.reddituploads.com",
+    "v.redd.it",
+    # Imgur
+    "imgur.com",
+    # Gfycat
+    "gfycat.com",
+    # IOPaste
+    "pub.iotek.org",
+    # Teknik
+    # "u.teknik.io",
+    # "upload.teknik.io",
+    # "v.teknik.io",
+    # Other
+    "redditmetrics.com/r/unixporn",
+    "reddit.com/r/trendingsubreddits"
+]
 
 # Workflow extensions
-EXTENSIONS = [".webm", ".gif", "gfycat", ".mp4"]
+EXTENSIONS = [".webm", ".gif", "gfycat", ".mp4", "v.redd.it"]
 
 # Strings for the "Hardware" flair
 HWSTRING = ["[desktop]",
@@ -213,30 +238,23 @@ OSSTRING = fillout(OSSTRING)
 # BOT LOGIN
 
 print(SUBREDDIT, "bot\n")
-r = Reddit(USERAGENT)
-while True:
-    try:
-        PASSWORD = getpass("Password: ")
-        r.login(USERNAME, PASSWORD)
-        print("Successfully logged in\n")
-        break
-    except errors.InvalidUserPass:
-        print("Wrong Username or Password\n")
-        quit()
-    except Exception as e:
-        print("%s" % e)
-        sleep(5)
+r = Reddit(client_id=getpass("ID: "),
+           client_secret=getpass("Secret: "),
+           user_agent=USERAGENT,
+           username=USERNAME,
+           password=getpass("Password: "))
 
 
 # DEFINING FUNCTIONS
 
 def slay(post, response):
     print("\tReplying to OP")
-    res = post.add_comment(response)
-    res.distinguish()
+    res = post.reply(response)
+    res.mod.distinguish(sticky=True)
     if not TRUSTME:
-        post.report()
-    post.remove(spam=False)
+        print("\tReporting to mods")
+        post.report("Reason in comments")
+    post.mod.remove(spam=False)
     print("\tPost removed")
     sleep(5)
 
@@ -253,29 +271,40 @@ def tag_check(post, ptitle):
         slay(post, NOTAGREPLY)
 
 
+def karma_check(post, pauthor):
+    """
+    Checks if the author's combined link and comment karma is < 5. If so
+    the post is removed, reported, and a comment is posted to inform OP
+    """
+    print("Checking karma...")
+    user = r.redditor(pauthor)
+    if user.link_karma + user.comment_karma < 5:
+        print("\tKARMA KO")
+        slay(post, KARMARM)
+        post.report("Low karma OP")
+    else:
+        print("\tKarma OK")
+
+
 def flair_assign(post, purl, ptitle, flair):
     print("Scanning for flairs...")
     if flair == "":
         print("\tNo Flair")
         if "[oc]" in ptitle:
             print("\tAssigning 'Material' flair")
-            post.set_flair(flair_text="Material", flair_css_class="material")
+            post.flair.select("d4539c64-1185-11e4-8276-12313b0d3999")
         elif post.is_self:
             print("\tAssigning 'Discussion' flair")
-            post.set_flair(flair_text="Discussion",
-                           flair_css_class="discussion")
+            post.flair.select("3ca0392e-016b-11e4-9698-12313b0ea137")
         elif any(word in ptitle for word in HWSTRING):
             print("\tAssigning 'Hardware' flair")
-            post.set_flair(flair_text="Hardware",
-                           flair_css_class="hardware")
+            post.flair.select("dcf2ee38-1185-11e4-8b85-12313d195526")
         elif any(word in purl for word in EXTENSIONS):
             print("\tAssigning 'Workflow' flair")
-            post.set_flair(flair_text="Workflow",
-                           flair_css_class="workflow")
+            post.flair.select("3a672136-016b-11e4-ac17-12313b0e95bd")
         else:
             print("\tAssigning 'Screenshot' flair")
-            post.set_flair(flair_text="Screenshot",
-                           flair_css_class="screenshot")
+            post.flair.select("30184610-016b-11e4-b64a-12313b0a9e38")
         print("\tFlair Assigned")
     else:
         print("\tAlready Flaired")
@@ -285,6 +314,9 @@ def approve_host(post, purl, ptitle):
     print("Verifying hosts...")
     if any(domain in purl for domain in WHITELIST) or post.is_self:
         pass
+    elif "teknik.io" in purl:
+        # Teknik currently having issues
+        slay(post, TEKNIKMSG)
     elif "[oc]" in ptitle:
         # Materials can come from any website
         pass
@@ -300,7 +332,7 @@ def details_scan(post, pauthor, ptime):
     """
 
     print("Checking details comments...")
-    comments = helpers.flatten_tree(post.comments)
+    comments = post.comments.list()
     commenters = []
     for comment in comments:
         try:
@@ -331,8 +363,8 @@ def details_scan(post, pauthor, ptime):
         elif (difference > (DELAY * 0.5)) and ("upmo" not in commenters):
             commenters = [comment.author.name for comment in comments]
             print("\tWarning OP")
-            response = post.add_comment(DETAILSWARN)
-            response.distinguish()
+            response = post.reply(DETAILSWARN)
+            response.mod.distinguish(sticky=True)
             return False
 
         else:
@@ -367,6 +399,7 @@ def actions(post):
             file.write(pid + "\n")
     tag_check(post, ptitle)
     approve_host(post, purl, ptitle)
+    karma_check(post, pauthor)
 
 
 def weekly_thread(sub, thread):
@@ -385,23 +418,29 @@ def weekly_thread(sub, thread):
 
 print("Running on r/" + SUBREDDIT)
 while True:
-    print("\nRunning at", strftime("%Y-%m-%d %H:%M:%S"))
-    subreddit = r.get_subreddit(SUBREDDIT)
-    posts = subreddit.get_new(limit=MAXPOSTS)
-
-    day = strftime("%a")
-    if strftime("%H:%M") == THREADTIME and day in THREADS:
-        weekly_thread(subreddit, THREADS[day])
-
     try:
-        with open("oldposts", "r") as file:
-            oldposts = [line.strip() for line in file]
-    except:
-        oldposts = []
+        print("\nRunning at", strftime("%Y-%m-%d %H:%M:%S"))
+        subreddit = r.subreddit(SUBREDDIT)
+        posts = subreddit.new(limit=MAXPOSTS)
 
-    for post in posts:
-        if post.id not in oldposts:
-            actions(post)
+        day = strftime("%a")
+        if strftime("%H:%M") == THREADTIME and day in THREADS:
+            weekly_thread(subreddit, THREADS[day])
+
+        try:
+            with open("oldposts", "r") as file:
+                oldposts = [line.strip() for line in file]
+        except:
+            oldposts = []
+
+        for post in posts:
+            if post.id not in oldposts:
+                actions(post)
+
+    except Exception as e:
+        log = strftime("%Y-%m-%d %H:%M:%S") + " " + str(e) + " " + str(type(e))
+        with open("errors", "a") as file:
+            file.write(log)
 
     # Calculates seconds left in current minute
     secs = 60 - int(strftime("%S"))
