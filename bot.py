@@ -411,6 +411,7 @@ def weekly_thread(sub, thread):
     title = "{} {}".format(thread["title"], strftime("%Y-%m-%d"))
     print("\tPosting", title, "thread")
     thread = sub.submit(title, selftext=thread["body"]).mod.sticky(bottom=True)
+    thread.comment_sort = 'new'
     print("\tDone!")
 
 
