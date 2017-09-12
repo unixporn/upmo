@@ -111,7 +111,7 @@ THREADS = {
     "Fri": {
         "title": "Weekly Workshop",
         "body": "This is a thread to get answers for all your questions, no "
-                "mater how stupid you think it may be. You can also post "
+                "matter how stupid you think it may be. You can also post "
                 "anything on topic, in any format you like, and using any "
                 "host. We hope this gives new users a chance to get some help "
                 "with any problems they're having and older users a chance to "
