@@ -93,27 +93,14 @@ DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
 
 # Set threads to be posted on a weekly basis
 THREADS = {
-    "Mon": {
-        "title": "Mockup Monday",
-        "body": "Got an idea for a great new theme or even a whole setup? "
-                "Then this is the thread for you! Whether it's just sharing "
-                "an idea, requests, or an illustration of the whole shebang "
-                "want to know what you'd like your setup to look like. Just "
-                "comment below and lets get the talk rolling. Shout out to "
-                "our friends over at r/unixmockups who are making a sub "
-                "dedicated to the sharing of these."
-                "\n\n"
-                "If you've already got a work in progress version of your "
-                "creation then please [share it with us]({}) as a post, we'd"
-                "love to see it! Remember to tag [OC] in the title so that "
-                "u/upmo can do its thing{}".format(SUBMITURL, CONTACT)
-    },
     "Fri": {
         "title": "Weekly Workshop",
         "body": "This is a thread to get answers for all your questions, no "
-                "matter how stupid you think it may be. You can also post "
-                "anything on topic, in any format you like, and using any "
-                "host. We hope this gives new users a chance to get some help "
+                "matter how stupid you think it may be. Feel free to share "
+                "your default setups here too, someone might have some "
+                "pointers for what to do next. In short you can make any on "
+                "topic comment, in any format you like, and using any host. "
+                "We hope this gives new users a chance to get some help "
                 "with any problems they're having and older users a chance to "
                 "show off their knowledge by helping those in need." + CONTACT
     }
