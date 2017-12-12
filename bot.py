@@ -85,11 +85,15 @@ HOSTRESPONSE = "You don't appear to be using an approved host: see " \
 TEKNIKPST = "https://redd.it/6ln5km"
 TEKNIKMSG = "Teknik is one of our approved hosts but is currently " \
             "experiencing some [technical difficulties]({0}). While " \
-            "this issue is being resolved plase repost using [another "\
+            "this issue is being resolved plase repost using [another " \
             "host]({1}).{2}".format(TEKNIKPST, RULELINK, CONTACT)
 
 # Warning when haven't added a details comment
 DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
+
+# Message when a post triggered upmo's spam filter
+SPAMCHK = "The following post has triggered the spam filter, " \
+          "please investigate. "
 
 # Set threads to be posted on a weekly basis
 THREADS = {
@@ -268,7 +272,7 @@ def karma_check(post, pauthor):
     if user.link_karma + user.comment_karma < 5:
         print("\tKARMA KO")
         slay(post, KARMARM)
-        post.report("Low karma OP")
+        r.subreddit(SUBREDDIT).message("Spam Check", SPAMCHK + post.permalink)
     else:
         print("\tKarma OK")
 
@@ -418,17 +422,17 @@ while True:
         try:
             with open("oldposts", "r") as file:
                 oldposts = [line.strip() for line in file]
-        except:
+        except FileNotFoundError:
             oldposts = []
 
         for post in posts:
-            if post.id not in oldposts:
+            if post.id not in oldposts and post.approved_by is None:
                 actions(post)
 
     except Exception as e:
         log = strftime("%Y-%m-%d %H:%M:%S") + " " + str(e) + " " + str(type(e))
         with open("errors", "a") as file:
-            file.write(log)
+            file.write(log + "\n")
 
     # Calculates seconds left in current minute
     secs = 60 - int(strftime("%S"))
