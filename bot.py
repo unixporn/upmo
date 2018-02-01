@@ -81,13 +81,6 @@ HOSTRESPONSE = "You don't appear to be using an approved host: see " \
                "one of them, but feel free to leave mirrors to host " \
                "in your details comment.{1}".format(RULELINK, CONTACT)
 
-# Message when people post with Teknik
-TEKNIKPST = "https://redd.it/6ln5km"
-TEKNIKMSG = "Teknik is one of our approved hosts but is currently " \
-            "experiencing some [technical difficulties]({0}). While " \
-            "this issue is being resolved plase repost using [another " \
-            "host]({1}).{2}".format(TEKNIKPST, RULELINK, CONTACT)
-
 # Warning when haven't added a details comment
 DETAILSWARN = "Please add a {0}.{1}".format(TEMPLATE, CONTACT)
 
@@ -151,9 +144,9 @@ WHITELIST = [
     # IOPaste
     "pub.iotek.org",
     # Teknik
-    # "u.teknik.io",
-    # "upload.teknik.io",
-    # "v.teknik.io",
+    "u.teknik.io",
+    "upload.teknik.io",
+    "v.teknik.io",
     # Other
     "redditmetrics.com/r/unixporn",
     "reddit.com/r/trendingsubreddits"
@@ -305,9 +298,6 @@ def approve_host(post, purl, ptitle):
     print("Verifying hosts...")
     if any(domain in purl for domain in WHITELIST) or post.is_self:
         pass
-    elif "teknik.io" in purl:
-        # Teknik currently having issues
-        slay(post, TEKNIKMSG)
     elif "[oc]" in ptitle:
         # Materials can come from any website
         pass
