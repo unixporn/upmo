@@ -380,7 +380,7 @@ def actions(post):
             file.write(pid + "\n")
     tag_check(post, ptitle)
     approve_host(post, purl, ptitle)
-    karma_check(post, pauthor)
+    # karma_check(post, pauthor)
 
 
 def weekly_thread(sub, thread):
