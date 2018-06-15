@@ -48,7 +48,7 @@ TEMPLATE = TEMPLATE.format(RURL, SUBREDDIT)
 
 # Message about reporting bot errors
 CONTACT = "\n\n*^[Contact]({0}) ^[us]({0}) ^if ^our ^bot ^has ^messed " \
-          "^up*".format(MODMSG)
+          "^(up)*".format(MODMSG)
 
 # Message when haven't added a details comment
 NODETAILS = "You have not provided a {0} so the post has been removed. " \
