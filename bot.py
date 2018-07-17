@@ -232,7 +232,7 @@ r = Reddit(client_id=getpass("ID: "),
 
 try:
     print("{} running on r/{}".format(r.user.me(), SUBREDDIT))
-except exceptions.ResponseException:
+except (exceptions.OAuthException, exceptions.ResponseException):
     print("Login error! Please try again.")
     exit(1)
 
