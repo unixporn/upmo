@@ -11,6 +11,7 @@ from sys import stdout
 from time import sleep, strftime, time
 from getpass import getpass
 from praw import Reddit
+from prawcore import exceptions
 
 
 # CONFIGURATION
@@ -205,7 +206,7 @@ OSSTRING = ["aix",
             "lfs", "linux", "gnu/linux",
             "linux mint", "linuxmint", "mint", "lmde",
             "lubuntu",
-            "macos", "mac os", "osx", "os x", "mac osx",  
+            "macos", "mac os", "osx", "os x", "mac osx",
             "manjaro",
             "netbsd",
             "nixos",
@@ -228,6 +229,12 @@ r = Reddit(client_id=getpass("ID: "),
            user_agent=USERAGENT,
            username=USERNAME,
            password=getpass("Password: "))
+
+try:
+    print("{} running on r/{}".format(r.user.me(), SUBREDDIT))
+except exceptions.ResponseException:
+    print("Login error! Please try again.")
+    exit(1)
 
 
 # DEFINING FUNCTIONS
@@ -399,7 +406,6 @@ def weekly_thread(sub, thread):
 
 # RUNNING BOT
 
-print("Running on r/" + SUBREDDIT)
 while True:
     try:
         print("\nRunning at", strftime("%Y-%m-%d %H:%M:%S"))
