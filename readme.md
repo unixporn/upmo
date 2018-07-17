@@ -9,6 +9,6 @@ Within [r/unixporn](https://www.reddit.com/r/unixporn) it carries out the follow
 * Removes posts without DE tagged in title
 * Assigns correct link flair to posts
 * Checks links are through approved hosts
-* Warns user if they haven't added a details comment after 10 minutes
-* Removes posts which haven't added a details comment after 20 minutes
+* Warns user if they haven't added a details comment after 15 minutes
+* Removes posts which haven't added a details comment after 30 minutes
 * Removes posts if the user doesn't meet the minimum karma requirements
