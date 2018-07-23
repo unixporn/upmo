@@ -72,6 +72,16 @@ DEPTAGREPLY = "Your post appears to be using one of the deprecated " \
               "[tags] so has been removed. The bot will automatically " \
               "apply the relevant link flair to posts." + CONTACT
 
+# Message when not using a tag for a self post
+SELFTAGREPLY = "Your post appears formatted incorrectly so was removed. " \
+               "Please repost as one of the following:\n\n" \
+               "* If you're trying share a screenshot or gif please use a " \
+               "\"Link\" post or an \"Image & Video\" post.\n\n" \
+               "* If you're asking for help with an issue please " \
+               "comment in the stickied weekly workshop thread.\n\n" \
+               "* If you're trying to start a discussion please follow rule " \
+               "5 in the sidebar." + CONTACT
+
 # Message when stating OS in a title tag
 OSREPLY = "Your post appears to be using the OS [tag] so has been " \
           "removed. This is now deprecated in favour of userflair." + CONTACT
@@ -257,6 +267,8 @@ def tag_check(post, ptitle):
         slay(post, DEPTAGREPLY)
     elif any(key.lower() in ptitle for key in OSSTRING):
         slay(post, OSREPLY)
+    elif post.is_self and not ptitle.startswith('| '):
+        slay(post, SELFTAGREPLY)
     elif any(tag in ptitle for tag in ["[", "]"]) or post.is_self:
         pass
     else:
