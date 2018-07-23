@@ -407,7 +407,7 @@ def weekly_thread(sub, thread):
     the THREADTIME that thread is posted to the sub as the bottom sticky
     """
     print("Getting weekly thread...")
-    title = "{} {}".format(thread["title"], strftime("%Y-%m-%d"))
+    title = "| {} {}".format(thread["title"], strftime("%Y-%m-%d"))
     print("\tPosting", title, "thread")
     thread = sub.submit(title, selftext=thread["body"]).mod.sticky(bottom=True)
     thread.comment_sort = 'new'
