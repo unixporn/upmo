@@ -152,8 +152,6 @@ WHITELIST = [
     "imgur.com",
     # Gfycat
     "gfycat.com",
-    # IOPaste
-    "pub.iotek.org",
     # Teknik
     "u.teknik.io",
     "upload.teknik.io",
