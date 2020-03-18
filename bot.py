@@ -62,7 +62,7 @@ KARMARM = "Your post has been caught in our spam filter. The mods have been " \
 
 # Message when not using a tag
 NOTAGREPLY = "Your post appears to be missing a title [tag] so has " \
-             "been removed. See [rule 4]({0}) for more details but " \
+             "been removed. See [rule 5]({0}) for more details but " \
              "briefly:\n\n* Screenshots requires [WM/DE]\n\n* Workflow " \
              "requires [WM/DE]\n\n* Hardware requires [DEVICE]\n\n" \
              "* Material requires [OC]{1}".format(RULELINK, CONTACT)
@@ -88,7 +88,7 @@ OSREPLY = "Your post appears to be using the OS [tag] so has been " \
 
 # Message when not using an approved host
 HOSTRESPONSE = "You don't appear to be using an approved host: see " \
-               "[rule 2]({0}) for more details. Please resubmit using " \
+               "[rule 3]({0}) for more details. Please resubmit using " \
                "one of them, but feel free to leave mirrors to host " \
                "in your details comment.{1}".format(RULELINK, CONTACT)
 
